@@ -1,0 +1,52 @@
+import { NextResponse } from "next/server"
+import { prisma } from "../../../../lib/prisma"
+import { startOfMonth, endOfMonth } from "date-fns"
+
+// GET - Estatísticas das gestantes
+export async function GET() {
+  try {
+    const totalGestantes = await prisma.gestante.count()
+    
+    const gestantesAltoRisco = await prisma.gestante.count({
+      where: {
+        risco: "Risco Alto",
+      },
+    })
+
+    // Contar partos deste mês (DPP no mês atual)
+    const inicioMes = startOfMonth(new Date())
+    const fimMes = endOfMonth(new Date())
+    
+    const partosEsteMes = await prisma.gestante.count({
+      where: {
+        dpp: {
+          gte: inicioMes,
+          lte: fimMes,
+        },
+      },
+    })
+
+    return NextResponse.json({
+      totalGestantes,
+      gestantesAltoRisco,
+      partosEsteMes,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+  } catch (error) {
+    console.error("Erro ao buscar estatísticas:", error)
+    const errorMessage = error instanceof Error ? error.message : "Erro ao buscar estatísticas"
+    return NextResponse.json(
+      { error: errorMessage },
+      { 
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  }
+}
+
