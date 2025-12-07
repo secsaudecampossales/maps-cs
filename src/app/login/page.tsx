@@ -28,13 +28,20 @@ export default function LoginPage() {
       })
 
       if (result?.error) {
+        console.error("Erro no login:", result.error)
         setErro("Email ou senha incorretos")
         setCarregando(false)
+      } else if (result?.ok) {
+        // Aguardar um pouco para garantir que a sessão foi criada
+        await new Promise(resolve => setTimeout(resolve, 100))
+        window.location.href = "/"
       } else {
-        router.push("/")
-        router.refresh()
+        console.error("Resultado inesperado:", result)
+        setErro("Erro ao fazer login. Tente novamente.")
+        setCarregando(false)
       }
     } catch (error) {
+      console.error("Erro ao fazer login:", error)
       setErro("Erro ao fazer login. Tente novamente.")
       setCarregando(false)
     }
