@@ -15,6 +15,7 @@ import Link from "next/link"
 interface Gestante {
   id: string
   nome: string
+  cartaoSus: string
   dum: string
   dpp: string
   etnia: string
@@ -38,6 +39,7 @@ export default function EditarGestantePage() {
   const [saving, setSaving] = useState(false)
   const [formData, setFormData] = useState({
     nome: "",
+    cartaoSus: "",
     dum: "",
     dpp: "",
     etnia: "",
@@ -68,6 +70,7 @@ export default function EditarGestantePage() {
         const gestante: Gestante = await response.json()
         setFormData({
           nome: gestante.nome,
+          cartaoSus: gestante.cartaoSus || "",
           dum: format(new Date(gestante.dum), "yyyy-MM-dd"),
           dpp: format(new Date(gestante.dpp), "yyyy-MM-dd"),
           etnia: gestante.etnia,
@@ -117,7 +120,7 @@ export default function EditarGestantePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!formData.nome || !formData.dum || !formData.etnia || !formData.risco) {
+    if (!formData.nome || !formData.cartaoSus || !formData.dum || !formData.etnia || !formData.risco) {
       alert("Por favor, preencha todos os campos obrigatórios.")
       return
     }
@@ -221,6 +224,21 @@ export default function EditarGestantePage() {
                 placeholder="Digite o nome completo"
                 required
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="cartaoSus">Cartão do SUS *</Label>
+              <Input
+                id="cartaoSus"
+                value={formData.cartaoSus}
+                onChange={(e) => setFormData({ ...formData, cartaoSus: e.target.value })}
+                placeholder="Digite o número do cartão do SUS"
+                required
+                maxLength={15}
+              />
+              <p className="text-xs text-gray-500">
+                Número do cartão do SUS (obrigatório e único)
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

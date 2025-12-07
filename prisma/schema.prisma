@@ -12,11 +12,22 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model UBS {
+  id          String       @id @default(cuid())
+  nome        String
+  endereco    String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  enfermeiros Enfermeiro[]
+}
+
 model Enfermeiro {
   id        String   @id @default(cuid())
   nome      String
   email     String   @unique
   senha     String // Hash da senha
+  ubsId     String?
+  ubs       UBS?     @relation(fields: [ubsId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -24,6 +35,7 @@ model Enfermeiro {
 model Gestante {
   id                  String   @id @default(cuid())
   nome                String
+  cartaoSus           String   @unique // Cartão do SUS (obrigatório e único)
   dum                 DateTime // Data da Última Menstruação
   dpp                 DateTime // Data Provável do Parto (calculada)
   etnia               String // Branco, Preto, Pardo, Indígena, Amarelo

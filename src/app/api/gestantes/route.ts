@@ -52,7 +52,20 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { nome, dum, etnia, gestacoesAnteriores, risco, descricaoRisco, motivoAltoRisco, exames } = body
+    const { nome, cartaoSus, dum, etnia, gestacoesAnteriores, risco, descricaoRisco, motivoAltoRisco, exames } = body
+
+    // Validação do cartão do SUS
+    if (!cartaoSus) {
+      return NextResponse.json(
+        { error: "Cartão do SUS é obrigatório" },
+        { 
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    }
 
     // Calcular DPP (DUM + 280 dias)
     const dpp = addDays(new Date(dum), 280)
@@ -60,6 +73,7 @@ export async function POST(request: NextRequest) {
     const gestante = await prisma.gestante.create({
       data: {
         nome,
+        cartaoSus,
         dum: new Date(dum),
         dpp,
         etnia,

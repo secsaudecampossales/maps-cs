@@ -60,7 +60,7 @@ export async function PUT(
   try {
     const { id } = await params
     const body = await request.json()
-    const { nome, dum, etnia, gestacoesAnteriores, risco, descricaoRisco, motivoAltoRisco, exames } = body
+    const { nome, cartaoSus, dum, etnia, gestacoesAnteriores, risco, descricaoRisco, motivoAltoRisco, exames } = body
 
     // Calcular DPP se DUM foi alterada
     let dpp = undefined
@@ -72,6 +72,7 @@ export async function PUT(
       where: { id },
       data: {
         ...(nome && { nome }),
+        ...(cartaoSus && { cartaoSus }),
         ...(dum && { dum: new Date(dum) }),
         ...(dpp && { dpp }),
         ...(etnia && { etnia }),
