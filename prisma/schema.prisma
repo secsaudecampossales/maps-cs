@@ -2,35 +2,46 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Enfermeiro {
+  id        String   @id @default(cuid())
+  nome      String
+  email     String   @unique
+  senha     String // Hash da senha
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Gestante {
-  id                    String   @id @default(cuid())
-  nome                  String
-  dum                   DateTime // Data da Última Menstruação
-  dpp                   DateTime // Data Provável do Parto (calculada)
-  etnia                 String   // Branco, Preto, Pardo, Indígena, Amarelo
-  gestacoesAnteriores   Int      @default(0)
-  risco                 String   // Risco Baixo, Risco Intermediário, Risco Alto
-  descricaoRisco        String?  // Para risco intermediário
-  motivoAltoRisco       String?  // Para risco alto (obrigatório)
-  
+  id                  String   @id @default(cuid())
+  nome                String
+  dum                 DateTime // Data da Última Menstruação
+  dpp                 DateTime // Data Provável do Parto (calculada)
+  etnia               String // Branco, Preto, Pardo, Indígena, Amarelo
+  gestacoesAnteriores Int      @default(0)
+  risco               String // Risco Baixo, Risco Intermediário, Risco Alto
+  descricaoRisco      String? // Para risco intermediário
+  motivoAltoRisco     String? // Para risco alto (obrigatório)
+
   // Exames de Rotina
-  exameRotina1Trimestre Boolean  @default(false)
-  exameRotina2Trimestre Boolean  @default(false)
-  exameRotina3Trimestre Boolean  @default(false)
-  
+  exameRotina1Trimestre Boolean @default(false)
+  exameRotina2Trimestre Boolean @default(false)
+  exameRotina3Trimestre Boolean @default(false)
+
   // Ultrassonografia
-  ultrassom1Trimestre   Boolean  @default(false)
-  ultrassom2Trimestre   Boolean  @default(false)
-  ultrassom3Trimestre   Boolean  @default(false)
-  
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  ultrassom1Trimestre Boolean @default(false)
+  ultrassom2Trimestre Boolean @default(false)
+  ultrassom3Trimestre Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -1,24 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MAPS-CS - Monitoramento da APS Campos Sales
 
-## Getting Started
+Sistema de monitoramento de gestantes na Atenção Primária à Saúde.
 
-First, run the development server:
+## 🚀 Getting Started
+
+### Pré-requisitos
+
+- Node.js 20.19+ (ou 22.12+, 24.0+)
+- npm ou yarn
+
+### Instalação
+
+1. Clone o repositório
+2. Instale as dependências:
+
+```bash
+npm install
+```
+
+3. Configure as variáveis de ambiente. Crie um arquivo `.env` na raiz do projeto:
+
+```env
+DATABASE_URL="file:./dev.db"
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="seu-secret-key-aqui-gerado-aleatoriamente"
+```
+
+Para gerar um `NEXTAUTH_SECRET`, você pode usar:
+```bash
+openssl rand -base64 32
+```
+
+4. Execute as migrations do banco de dados:
+
+```bash
+npx prisma migrate deploy
+```
+
+5. Crie os usuários enfermeiros iniciais executando o script de seed:
+
+```bash
+npm run seed
+```
+
+Isso criará dois enfermeiros de exemplo:
+- Email: `enfermeiro1@ubs.com` / Senha: `senha123`
+- Email: `enfermeiro2@ubs.com` / Senha: `senha123`
+
+⚠️ **IMPORTANTE**: Altere as senhas após o primeiro login!
+
+6. Inicie o servidor de desenvolvimento:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000) no navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🔐 Sistema de Autenticação
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+O sistema possui autenticação obrigatória. Apenas enfermeiros podem acessar o sistema.
+
+### Criar Novos Usuários
+
+**Novos usuários só podem ser criados através do script de seed** (`prisma/seed.ts`). Para adicionar um novo enfermeiro:
+
+1. Edite o arquivo `prisma/seed.ts`
+2. Adicione um novo `upsert` para o enfermeiro desejado
+3. Execute `npm run seed` novamente
+
+Exemplo:
+```typescript
+const enfermeiro3 = await prisma.enfermeiro.upsert({
+  where: { email: "novo.enfermeiro@ubs.com" },
+  update: {},
+  create: {
+    nome: "Novo Enfermeiro",
+    email: "novo.enfermeiro@ubs.com",
+    senha: await bcrypt.hash("senhaSegura123", 10),
+  },
+})
+```
+
+### Login
+
+Acesse `/login` para fazer login no sistema. Todas as rotas (exceto `/login` e `/api/auth`) são protegidas e requerem autenticação.
 
 ## Learn More
 

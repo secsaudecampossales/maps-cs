@@ -1,9 +1,13 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../../../lib/prisma"
 import { startOfMonth, endOfMonth } from "date-fns"
+import { requireAuth } from "../../../../lib/auth-api"
 
 // GET - Estatísticas das gestantes
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const authError = await requireAuth(request)
+  if (authError) return authError
+
   try {
     const totalGestantes = await prisma.gestante.count()
     
