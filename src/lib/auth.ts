@@ -40,6 +40,7 @@ export const authOptions: NextAuthOptions = {
             id: enfermeiro.id,
             email: enfermeiro.email,
             name: enfermeiro.nome,
+            isAdmin: enfermeiro.isAdmin,
           }
         } catch (error) {
           console.error("Erro no authorize:", error)
@@ -58,12 +59,14 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
+        token.isAdmin = user.isAdmin
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string
+        session.user.isAdmin = token.isAdmin as boolean
       }
       return session
     }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -12,12 +12,20 @@ import { addDays, format } from "date-fns"
 import { ArrowLeft, Save } from "lucide-react"
 import Link from "next/link"
 
+interface UBS {
+  id: string
+  nome: string
+  endereco: string
+}
+
 export default function NovaGestantePage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [ubsList, setUbsList] = useState<UBS[]>([])
   const [formData, setFormData] = useState({
     nome: "",
     cartaoSus: "",
+    ubsId: "",
     dum: "",
     dpp: "",
     etnia: "",
@@ -34,6 +42,22 @@ export default function NovaGestantePage() {
       ultrassom3: false,
     },
   })
+
+  useEffect(() => {
+    fetchUBS()
+  }, [])
+
+  const fetchUBS = async () => {
+    try {
+      const response = await fetch("/api/ubs")
+      if (response.ok) {
+        const ubs = await response.json()
+        setUbsList(ubs)
+      }
+    } catch (error) {
+      console.error("Erro ao buscar UBS:", error)
+    }
+  }
 
   const handleDumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const dum = e.target.value
@@ -57,7 +81,7 @@ export default function NovaGestantePage() {
     e.preventDefault()
 
     // Validações
-    if (!formData.nome || !formData.cartaoSus || !formData.dum || !formData.etnia || !formData.risco) {
+    if (!formData.nome || !formData.cartaoSus || !formData.ubsId || !formData.dum || !formData.etnia || !formData.risco) {
       alert("Por favor, preencha todos os campos obrigatórios.")
       return
     }
@@ -139,6 +163,26 @@ export default function NovaGestantePage() {
               <p className="text-xs text-gray-500">
                 Número do cartão do SUS (obrigatório e único)
               </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="ubsId">UBS *</Label>
+              <Select
+                value={formData.ubsId || undefined}
+                onValueChange={(value) => setFormData({ ...formData, ubsId: value })}
+                required
+              >
+                <SelectTrigger id="ubsId">
+                  <SelectValue placeholder="Selecione a UBS" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ubsList.map((ubs) => (
+                    <SelectItem key={ubs.id} value={ubs.id}>
+                      {ubs.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

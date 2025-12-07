@@ -10,6 +10,15 @@ export async function GET(request: NextRequest) {
   try {
     console.log("Iniciando busca de gestantes...")
     const gestantes = await prisma.gestante.findMany({
+      include: {
+        ubs: {
+          select: {
+            id: true,
+            nome: true,
+            endereco: true,
+          },
+        },
+      },
       orderBy: {
         createdAt: "desc",
       },
@@ -52,12 +61,24 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { nome, cartaoSus, dum, etnia, gestacoesAnteriores, risco, descricaoRisco, motivoAltoRisco, exames } = body
+    const { nome, cartaoSus, ubsId, dum, etnia, gestacoesAnteriores, risco, descricaoRisco, motivoAltoRisco, exames } = body
 
-    // Validação do cartão do SUS
+    // Validações
     if (!cartaoSus) {
       return NextResponse.json(
         { error: "Cartão do SUS é obrigatório" },
+        { 
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    }
+
+    if (!ubsId) {
+      return NextResponse.json(
+        { error: "UBS é obrigatória" },
         { 
           status: 400,
           headers: {
@@ -74,6 +95,7 @@ export async function POST(request: NextRequest) {
       data: {
         nome,
         cartaoSus,
+        ubsId,
         dum: new Date(dum),
         dpp,
         etnia,

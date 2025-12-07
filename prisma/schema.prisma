@@ -19,6 +19,7 @@ model UBS {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   enfermeiros Enfermeiro[]
+  gestantes   Gestante[]
 }
 
 model Enfermeiro {
@@ -26,6 +27,7 @@ model Enfermeiro {
   nome      String
   email     String   @unique
   senha     String // Hash da senha
+  isAdmin   Boolean  @default(false) // Indica se é administrador
   ubsId     String?
   ubs       UBS?     @relation(fields: [ubsId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
@@ -36,6 +38,8 @@ model Gestante {
   id                  String   @id @default(cuid())
   nome                String
   cartaoSus           String   @unique // Cartão do SUS (obrigatório e único)
+  ubsId               String // UBS à qual a gestante pertence
+  ubs                 UBS      @relation(fields: [ubsId], references: [id], onDelete: Cascade)
   dum                 DateTime // Data da Última Menstruação
   dpp                 DateTime // Data Provável do Parto (calculada)
   etnia               String // Branco, Preto, Pardo, Indígena, Amarelo

@@ -16,6 +16,7 @@ interface Gestante {
   id: string
   nome: string
   cartaoSus: string
+  ubsId: string
   dum: string
   dpp: string
   etnia: string
@@ -31,15 +32,23 @@ interface Gestante {
   ultrassom3Trimestre: boolean
 }
 
+interface UBS {
+  id: string
+  nome: string
+  endereco: string
+}
+
 export default function EditarGestantePage() {
   const router = useRouter()
   const params = useParams()
   const id = params.id as string
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [ubsList, setUbsList] = useState<UBS[]>([])
   const [formData, setFormData] = useState({
     nome: "",
     cartaoSus: "",
+    ubsId: "",
     dum: "",
     dpp: "",
     etnia: "",
@@ -58,10 +67,23 @@ export default function EditarGestantePage() {
   })
 
   useEffect(() => {
+    fetchUBS()
     if (id) {
       fetchGestante()
     }
   }, [id])
+
+  const fetchUBS = async () => {
+    try {
+      const response = await fetch("/api/ubs")
+      if (response.ok) {
+        const ubs = await response.json()
+        setUbsList(ubs)
+      }
+    } catch (error) {
+      console.error("Erro ao buscar UBS:", error)
+    }
+  }
 
   const fetchGestante = async () => {
     try {
@@ -71,6 +93,7 @@ export default function EditarGestantePage() {
         setFormData({
           nome: gestante.nome,
           cartaoSus: gestante.cartaoSus || "",
+          ubsId: gestante.ubsId || "",
           dum: format(new Date(gestante.dum), "yyyy-MM-dd"),
           dpp: format(new Date(gestante.dpp), "yyyy-MM-dd"),
           etnia: gestante.etnia,
@@ -120,7 +143,7 @@ export default function EditarGestantePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!formData.nome || !formData.cartaoSus || !formData.dum || !formData.etnia || !formData.risco) {
+    if (!formData.nome || !formData.cartaoSus || !formData.ubsId || !formData.dum || !formData.etnia || !formData.risco) {
       alert("Por favor, preencha todos os campos obrigatórios.")
       return
     }
@@ -239,6 +262,26 @@ export default function EditarGestantePage() {
               <p className="text-xs text-gray-500">
                 Número do cartão do SUS (obrigatório e único)
               </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="ubsId">UBS *</Label>
+              <Select
+                value={formData.ubsId || undefined}
+                onValueChange={(value) => setFormData({ ...formData, ubsId: value })}
+                required
+              >
+                <SelectTrigger id="ubsId">
+                  <SelectValue placeholder="Selecione a UBS" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ubsList.map((ubs) => (
+                    <SelectItem key={ubs.id} value={ubs.id}>
+                      {ubs.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

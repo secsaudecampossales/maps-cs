@@ -31,6 +31,15 @@ export function Header() {
             </div>
             {session && (
               <div className="flex items-center gap-4">
+                {session.user?.isAdmin && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                  >
+                    <a href="/admin">Área Admin</a>
+                  </Button>
+                )}
                 <span className="text-sm text-gray-600">
                   {session.user?.name}
                 </span>
