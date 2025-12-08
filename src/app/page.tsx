@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Edit, Users, AlertTriangle, Baby } from "lucide-react"
+import { Plus, Edit, Users, AlertTriangle, Baby, Trash2 } from "lucide-react"
 
 interface Gestante {
   id: string
@@ -23,6 +24,7 @@ interface Stats {
 }
 
 export default function Dashboard() {
+  const { data: session } = useSession()
   const [gestantes, setGestantes] = useState<Gestante[]>([])
   const [stats, setStats] = useState<Stats>({
     totalGestantes: 0,
@@ -30,6 +32,9 @@ export default function Dashboard() {
     partosEsteMes: 0,
   })
   const [loading, setLoading] = useState(true)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [cleaning, setCleaning] = useState(false)
+  const [showCleanupConfirm, setShowCleanupConfirm] = useState(false)
 
   useEffect(() => {
     fetchData()
@@ -119,20 +124,116 @@ export default function Dashboard() {
     return new Date(dateString).toLocaleDateString("pt-BR")
   }
 
+  const handleDelete = async (gestanteId: string) => {
+    const gestante = gestantes.find((g) => g.id === gestanteId)
+    const nome = gestante?.nome ? ` de ${gestante.nome}` : ""
+    if (!confirm(`Tem certeza que deseja excluir a gestante${nome}?`)) {
+      return
+    }
+
+    setDeletingId(gestanteId)
+    try {
+      const response = await fetch(`/api/gestantes/${gestanteId}`, {
+        method: "DELETE",
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Erro ao excluir gestante")
+      }
+
+      await fetchData()
+    } catch (error) {
+      console.error("Erro ao excluir gestante:", error)
+      alert("Não foi possível excluir a gestante. Tente novamente.")
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  const handleCleanupExGestantes = async () => {
+    setShowCleanupConfirm(false)
+    setCleaning(true)
+    try {
+      const response = await fetch("/api/admin/gestantes/cleanup", {
+        method: "POST",
+      })
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Erro ao remover ex-gestantes")
+      }
+      await fetchData()
+    } catch (error) {
+      console.error("Erro ao remover ex-gestantes:", error)
+      alert("Não foi possível remover ex-gestantes. Tente novamente.")
+    } finally {
+      setCleaning(false)
+    }
+  }
+
   return (
     <div className="space-y-8">
+      {showCleanupConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+          <div className="w-full max-w-md rounded-lg bg-white shadow-lg border border-gray-200">
+            <div className="px-6 py-4 border-b">
+              <h2 className="text-lg font-semibold text-gray-900">Remover Ex-Gestantes</h2>
+              <p className="text-sm text-gray-600 mt-1">
+                Isso vai excluir automaticamente todas as gestantes cuja DPP já passou.
+                Esta ação não pode ser desfeita.
+              </p>
+            </div>
+            <div className="px-6 py-4 flex flex-col gap-4">
+              <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-800">
+                Confirme apenas se já registrou o desfecho dessas gestantes. A remoção é definitiva.
+              </div>
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCleanupConfirm(false)}
+                  disabled={cleaning}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleCleanupExGestantes}
+                  disabled={cleaning}
+                  className="gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {cleaning ? "Removendo..." : "Confirmar remoção"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Título e Botão de Adicionar */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-600 mt-2">Monitoramento de Gestantes - APS Campos Sales</p>
         </div>
-        <Link href="/gestantes/novo">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Nova Gestante
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          {session?.user?.isAdmin && (
+            <Button
+              variant="destructive"
+              className="gap-2"
+              onClick={() => setShowCleanupConfirm(true)}
+              disabled={cleaning}
+            >
+              <Trash2 className="h-4 w-4" />
+              {cleaning ? "Removendo..." : "Remover Ex-Gestantes"}
+            </Button>
+          )}
+          <Link href="/gestantes/novo">
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Nova Gestante
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Cards de Estatísticas */}
@@ -225,12 +326,24 @@ export default function Dashboard() {
                         </span>
                       </td>
                       <td className="p-4">
-                        <Link href={`/gestantes/${gestante.id}`}>
-                          <Button variant="outline" size="sm" className="gap-2">
-                            <Edit className="h-3 w-3" />
-                            Editar
+                        <div className="flex gap-2">
+                          <Link href={`/gestantes/${gestante.id}`}>
+                            <Button variant="outline" size="sm" className="gap-2">
+                              <Edit className="h-3 w-3" />
+                              Editar
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="gap-2"
+                            onClick={() => handleDelete(gestante.id)}
+                            disabled={deletingId === gestante.id}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                            {deletingId === gestante.id ? "Excluindo..." : "Excluir"}
                           </Button>
-                        </Link>
+                        </div>
                       </td>
                     </tr>
                   ))}

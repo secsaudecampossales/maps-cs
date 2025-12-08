@@ -18,6 +18,18 @@ interface UBS {
   endereco: string
 }
 
+const formatCartaoSus = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 15)
+  const parts = []
+  if (digits.length > 0) parts.push(digits.slice(0, 3))
+  if (digits.length > 3) parts.push(digits.slice(3, 7))
+  if (digits.length > 7) parts.push(digits.slice(7, 11))
+  if (digits.length > 11) parts.push(digits.slice(11, 15))
+  return parts.join(" ")
+}
+
+const sanitizeCartaoSus = (value: string) => value.replace(/\D/g, "").slice(0, 15)
+
 export default function NovaGestantePage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -59,6 +71,13 @@ export default function NovaGestantePage() {
     }
   }
 
+  const handleCartaoSusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      cartaoSus: formatCartaoSus(e.target.value),
+    })
+  }
+
   const handleDumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const dum = e.target.value
     if (dum) {
@@ -80,8 +99,10 @@ export default function NovaGestantePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    const cartaoSus = sanitizeCartaoSus(formData.cartaoSus)
+
     // Validações
-    if (!formData.nome || !formData.cartaoSus || !formData.ubsId || !formData.dum || !formData.etnia || !formData.risco) {
+    if (!formData.nome || !cartaoSus || !formData.ubsId || !formData.dum || !formData.etnia || !formData.risco) {
       alert("Por favor, preencha todos os campos obrigatórios.")
       return
     }
@@ -99,7 +120,10 @@ export default function NovaGestantePage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          cartaoSus,
+        }),
       })
 
       if (response.ok) {
@@ -155,10 +179,10 @@ export default function NovaGestantePage() {
               <Input
                 id="cartaoSus"
                 value={formData.cartaoSus}
-                onChange={(e) => setFormData({ ...formData, cartaoSus: e.target.value })}
+                onChange={handleCartaoSusChange}
                 placeholder="Digite o número do cartão do SUS"
                 required
-                maxLength={15}
+                maxLength={18}
               />
               <p className="text-xs text-gray-500">
                 Número do cartão do SUS (obrigatório e único)

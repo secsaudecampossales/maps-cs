@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../../../lib/prisma"
 import { startOfMonth, endOfMonth } from "date-fns"
 import { requireAuth } from "../../../../lib/auth-api"
+import { removeGestantesComDppVencida } from "../../../../lib/gestantes"
 
 // GET - Estatísticas das gestantes
 export async function GET(request: NextRequest) {
@@ -9,6 +10,7 @@ export async function GET(request: NextRequest) {
   if (authError) return authError
 
   try {
+    await removeGestantesComDppVencida()
     const totalGestantes = await prisma.gestante.count()
     
     const gestantesAltoRisco = await prisma.gestante.count({

@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../../lib/prisma"
 import { addDays } from "date-fns"
 import { requireAuth } from "../../../lib/auth-api"
+import { removeGestantesComDppVencida } from "../../../lib/gestantes"
 
 // GET - Listar todas as gestantes
 export async function GET(request: NextRequest) {
   const authError = await requireAuth(request)
   if (authError) return authError
   try {
+    await removeGestantesComDppVencida()
     console.log("Iniciando busca de gestantes...")
     const gestantes = await prisma.gestante.findMany({
       include: {
