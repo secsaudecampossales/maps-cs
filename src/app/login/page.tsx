@@ -52,7 +52,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-blue-600 mb-2">MAPS-CS</h1>
-          <p className="text-gray-600">Sistema de Monitoramento de Gestantes</p>
+          <p className="text-gray-600">Monitoramento da Atenção Primaria em Saúde - Campos Sales</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

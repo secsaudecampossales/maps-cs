@@ -390,7 +390,7 @@ export default function NovaGestantePage() {
                       }
                     />
                     <Label htmlFor="ultrassom1" className="cursor-pointer">
-                      1º Tri
+                      1º Trimestre
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -405,7 +405,7 @@ export default function NovaGestantePage() {
                       }
                     />
                     <Label htmlFor="ultrassom2" className="cursor-pointer">
-                      2º Tri
+                      2º Trimestre
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -420,7 +420,7 @@ export default function NovaGestantePage() {
                       }
                     />
                     <Label htmlFor="ultrassom3" className="cursor-pointer">
-                      3º Tri
+                      3º Trimestre
                     </Label>
                   </div>
                 </div>
