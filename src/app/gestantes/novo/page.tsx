@@ -199,7 +199,7 @@ export default function NovaGestantePage() {
                 <SelectTrigger id="ubsId">
                   <SelectValue placeholder="Selecione a UBS" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-64 overflow-y-auto">
                   {ubsList.map((ubs) => (
                     <SelectItem key={ubs.id} value={ubs.id}>
                       {ubs.nome}
