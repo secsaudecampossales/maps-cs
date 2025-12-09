@@ -60,7 +60,19 @@ export async function PUT(
   try {
     const { id } = await params
     const body = await request.json()
-    const { nome, cartaoSus, ubsId, dum, etnia, gestacoesAnteriores, risco, descricaoRisco, motivoAltoRisco, exames } = body
+    const {
+      nome,
+      cartaoSus,
+      ubsId,
+      dum,
+      etnia,
+      gestacoesAnteriores,
+      risco,
+      descricaoRisco,
+      motivoAltoRisco,
+      exames,
+      vacinas,
+    } = body
 
     // Calcular DPP se DUM foi alterada
     let dpp = undefined
@@ -88,6 +100,14 @@ export async function PUT(
           ultrassom1Trimestre: exames.ultrassom1 ?? undefined,
           ultrassom2Trimestre: exames.ultrassom2 ?? undefined,
           ultrassom3Trimestre: exames.ultrassom3 ?? undefined,
+        }),
+        ...(vacinas && {
+          vacinaHB: vacinas.hb ?? undefined,
+          vacinaDT: vacinas.dt ?? undefined,
+          vacinaInfluenza: vacinas.influenza ?? undefined,
+          vacinaCovid19: vacinas.covid19 ?? undefined,
+          vacinaDTPA20Semana: vacinas.dtpa20Semana ?? undefined,
+          vacinaVSR28Semana: vacinas.vsr28Semana ?? undefined,
         }),
       },
     })

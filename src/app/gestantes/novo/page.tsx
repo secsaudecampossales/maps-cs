@@ -53,6 +53,14 @@ export default function NovaGestantePage() {
       ultrassom2: false,
       ultrassom3: false,
     },
+    vacinas: {
+      hb: false,
+      dt: false,
+      influenza: false,
+      covid19: false,
+      dtpa20Semana: false,
+      vsr28Semana: false,
+    },
   })
 
   useEffect(() => {
@@ -448,6 +456,102 @@ export default function NovaGestantePage() {
                     </Label>
                   </div>
                 </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 5. Monitoramento de Vacinas */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Monitoramento de Vacinas</CardTitle>
+            <CardDescription>Marque as vacinas aplicadas</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="vacina-hb"
+                  checked={formData.vacinas.hb}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, vacinas: { ...formData.vacinas, hb: checked === true } })
+                  }
+                />
+                <Label htmlFor="vacina-hb" className="cursor-pointer">
+                  HB - Hepatite B
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="vacina-dt"
+                  checked={formData.vacinas.dt}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, vacinas: { ...formData.vacinas, dt: checked === true } })
+                  }
+                />
+                <Label htmlFor="vacina-dt" className="cursor-pointer">
+                  DT - Dupla Adulto
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="vacina-influenza"
+                  checked={formData.vacinas.influenza}
+                  onCheckedChange={(checked) =>
+                    setFormData({
+                      ...formData,
+                      vacinas: { ...formData.vacinas, influenza: checked === true },
+                    })
+                  }
+                />
+                <Label htmlFor="vacina-influenza" className="cursor-pointer">
+                  Influenza
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="vacina-covid"
+                  checked={formData.vacinas.covid19}
+                  onCheckedChange={(checked) =>
+                    setFormData({
+                      ...formData,
+                      vacinas: { ...formData.vacinas, covid19: checked === true },
+                    })
+                  }
+                />
+                <Label htmlFor="vacina-covid" className="cursor-pointer">
+                  Covid-19
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="vacina-dtpa"
+                  checked={formData.vacinas.dtpa20Semana}
+                  onCheckedChange={(checked) =>
+                    setFormData({
+                      ...formData,
+                      vacinas: { ...formData.vacinas, dtpa20Semana: checked === true },
+                    })
+                  }
+                />
+                <Label htmlFor="vacina-dtpa" className="cursor-pointer">
+                  DTPA - 20º semana gestacional
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="vacina-vsr"
+                  checked={formData.vacinas.vsr28Semana}
+                  onCheckedChange={(checked) =>
+                    setFormData({
+                      ...formData,
+                      vacinas: { ...formData.vacinas, vsr28Semana: checked === true },
+                    })
+                  }
+                />
+                <Label htmlFor="vacina-vsr" className="cursor-pointer">
+                  VSR - Vírus Sincicial Respiratório 28º semana gestacional
+                </Label>
               </div>
             </div>
           </CardContent>

@@ -63,7 +63,19 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { nome, cartaoSus, ubsId, dum, etnia, gestacoesAnteriores, risco, descricaoRisco, motivoAltoRisco, exames } = body
+    const {
+      nome,
+      cartaoSus,
+      ubsId,
+      dum,
+      etnia,
+      gestacoesAnteriores,
+      risco,
+      descricaoRisco,
+      motivoAltoRisco,
+      exames,
+      vacinas,
+    } = body
 
     // Validações
     if (!cartaoSus) {
@@ -111,6 +123,12 @@ export async function POST(request: NextRequest) {
         ultrassom1Trimestre: exames?.ultrassom1 || false,
         ultrassom2Trimestre: exames?.ultrassom2 || false,
         ultrassom3Trimestre: exames?.ultrassom3 || false,
+        vacinaHB: vacinas?.hb || false,
+        vacinaDT: vacinas?.dt || false,
+        vacinaInfluenza: vacinas?.influenza || false,
+        vacinaCovid19: vacinas?.covid19 || false,
+        vacinaDTPA20Semana: vacinas?.dtpa20Semana || false,
+        vacinaVSR28Semana: vacinas?.vsr28Semana || false,
       },
     })
 

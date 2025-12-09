@@ -58,6 +58,14 @@ model Gestante {
   ultrassom2Trimestre Boolean @default(false)
   ultrassom3Trimestre Boolean @default(false)
 
+  // Vacinas
+  vacinaHB               Boolean @default(false)
+  vacinaDT               Boolean @default(false)
+  vacinaInfluenza        Boolean @default(false)
+  vacinaCovid19          Boolean @default(false)
+  vacinaDTPA20Semana     Boolean @default(false)
+  vacinaVSR28Semana      Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
