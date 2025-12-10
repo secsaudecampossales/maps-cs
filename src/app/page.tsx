@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useSession } from "next-auth/react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Edit, Users, AlertTriangle, AlertCircle, Baby, Trash2 } from "lucide-react"
+import { Plus, Edit, Users, AlertTriangle, AlertCircle, Baby, Trash2, Eye } from "lucide-react"
 
 interface Gestante {
   id: string
@@ -349,6 +349,12 @@ export default function Dashboard() {
                             <Button variant="outline" size="sm" className="gap-2">
                               <Edit className="h-3 w-3" />
                               Editar
+                            </Button>
+                          </Link>
+                          <Link href={`/gestantes/${gestante.id}/visualizar`}>
+                            <Button variant="outline" size="sm" className="gap-2 bg-blue-500 text-white">
+                              <Eye className="h-3 w-3" />
+                              Ver
                             </Button>
                           </Link>
                           <Button
