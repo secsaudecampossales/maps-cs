@@ -144,7 +144,7 @@ export default function VisualizarGestantePage() {
       <Card className="grid grid-cols-2 justify-center">
         <Card className="border-none shadow-none">
         <CardHeader>
-          <CardTitle>Exames Realizados</CardTitle>
+          <CardTitle>Exames de Rotina</CardTitle>
           </CardHeader>
         <CardContent className="grid grid-cols-1 gap-4">
           <InfoItem label="Rotina 1º trimestre" value={yesNo(gestante.exameRotina1Trimestre)} />
