@@ -21,7 +21,15 @@ export const authOptions: NextAuthOptions = {
           const enfermeiro = await prisma.enfermeiro.findUnique({
             where: {
               email: credentials.email
-            }
+            },
+            select: {
+              id: true,
+              email: true,
+              nome: true,
+              senha: true,
+              isAdmin: true,
+              ubsId: true,
+            },
           })
 
           if (!enfermeiro) {
@@ -41,6 +49,7 @@ export const authOptions: NextAuthOptions = {
             email: enfermeiro.email,
             name: enfermeiro.nome,
             isAdmin: enfermeiro.isAdmin,
+            ubsId: enfermeiro.ubsId,
           }
         } catch (error) {
           console.error("Erro no authorize:", error)
@@ -60,6 +69,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
         token.isAdmin = user.isAdmin
+        token.ubsId = user.ubsId
       }
       return token
     },
@@ -67,6 +77,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string
         session.user.isAdmin = token.isAdmin as boolean
+        session.user.ubsId = token.ubsId as string | undefined
       }
       return session
     }

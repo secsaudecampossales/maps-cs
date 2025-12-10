@@ -7,6 +7,7 @@ declare module "next-auth" {
       email: string
       name: string
       isAdmin: boolean
+      ubsId?: string
     }
   }
 
@@ -15,6 +16,7 @@ declare module "next-auth" {
     email: string
     name: string
     isAdmin: boolean
+    ubsId?: string
   }
 }
 
@@ -22,6 +24,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string
     isAdmin: boolean
+    ubsId?: string
   }
 }
 

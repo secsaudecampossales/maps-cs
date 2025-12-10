@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../../../lib/prisma"
 import { startOfMonth, endOfMonth } from "date-fns"
-import { requireAuth } from "../../../../lib/auth-api"
+import { getAuthSession, requireAuth } from "../../../../lib/auth-api"
 import { removeGestantesComDppVencida } from "../../../../lib/gestantes"
 
 // GET - Estatísticas das gestantes
@@ -10,11 +10,30 @@ export async function GET(request: NextRequest) {
   if (authError) return authError
 
   try {
+    const session = await getAuthSession()
+    if (!session?.user) {
+      return NextResponse.json({ error: "Sessão não encontrada" }, { status: 401 })
+    }
+
+    if (!session.user.isAdmin && !session.user.ubsId) {
+      return NextResponse.json(
+        { error: "Profissional sem UBS associada" },
+        { status: 400 }
+      )
+    }
+
+    const whereClause = session.user.isAdmin
+      ? undefined
+      : { ubsId: session.user.ubsId! }
+
     await removeGestantesComDppVencida()
-    const totalGestantes = await prisma.gestante.count()
+    const totalGestantes = await prisma.gestante.count({
+      where: whereClause,
+    })
     
     const gestantesAltoRisco = await prisma.gestante.count({
       where: {
+        ...whereClause,
         risco: "Risco Alto",
       },
     })
@@ -25,6 +44,7 @@ export async function GET(request: NextRequest) {
     
     const partosEsteMes = await prisma.gestante.count({
       where: {
+        ...whereClause,
         dpp: {
           gte: inicioMes,
           lte: fimMes,

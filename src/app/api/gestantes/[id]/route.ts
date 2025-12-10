@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../../../lib/prisma"
 import { addDays } from "date-fns"
-import { requireAuth } from "../../../../lib/auth-api"
+import { getAuthSession, requireAuth } from "../../../../lib/auth-api"
 
 // GET - Buscar gestante por ID
 export async function GET(
@@ -10,6 +10,10 @@ export async function GET(
 ) {
   const authError = await requireAuth(request)
   if (authError) return authError
+  const session = await getAuthSession()
+  if (!session?.user) {
+    return NextResponse.json({ error: "Sessão não encontrada" }, { status: 401 })
+  }
 
   try {
     const { id } = await params
@@ -26,6 +30,13 @@ export async function GET(
             'Content-Type': 'application/json',
           },
         }
+      )
+    }
+
+    if (!session.user.isAdmin && gestante.ubsId !== session.user.ubsId) {
+      return NextResponse.json(
+        { error: "Acesso negado à gestante" },
+        { status: 403 }
       )
     }
 
@@ -56,6 +67,10 @@ export async function PUT(
 ) {
   const authError = await requireAuth(request)
   if (authError) return authError
+  const session = await getAuthSession()
+  if (!session?.user) {
+    return NextResponse.json({ error: "Sessão não encontrada" }, { status: 401 })
+  }
 
   try {
     const { id } = await params
@@ -80,12 +95,24 @@ export async function PUT(
       dpp = addDays(new Date(dum), 280)
     }
 
+    const gestanteAtual = await prisma.gestante.findUnique({ where: { id } })
+    if (!gestanteAtual) {
+      return NextResponse.json({ error: "Gestante não encontrada" }, { status: 404 })
+    }
+
+    if (!session.user.isAdmin && gestanteAtual.ubsId !== session.user.ubsId) {
+      return NextResponse.json(
+        { error: "Acesso negado à gestante" },
+        { status: 403 }
+      )
+    }
+
     const gestante = await prisma.gestante.update({
       where: { id },
       data: {
         ...(nome && { nome }),
         ...(cartaoSus && { cartaoSus }),
-        ...(ubsId && { ubsId }),
+        ...(session.user.isAdmin && ubsId && { ubsId }),
         ...(dum && { dum: new Date(dum) }),
         ...(dpp && { dpp }),
         ...(etnia && { etnia }),
@@ -139,9 +166,25 @@ export async function DELETE(
 ) {
   const authError = await requireAuth(request)
   if (authError) return authError
+  const session = await getAuthSession()
+  if (!session?.user) {
+    return NextResponse.json({ error: "Sessão não encontrada" }, { status: 401 })
+  }
 
   try {
     const { id } = await params
+    const gestanteAtual = await prisma.gestante.findUnique({ where: { id } })
+    if (!gestanteAtual) {
+      return NextResponse.json({ error: "Gestante não encontrada" }, { status: 404 })
+    }
+
+    if (!session.user.isAdmin && gestanteAtual.ubsId !== session.user.ubsId) {
+      return NextResponse.json(
+        { error: "Acesso negado à gestante" },
+        { status: 403 }
+      )
+    }
+
     await prisma.gestante.delete({
       where: { id },
     })

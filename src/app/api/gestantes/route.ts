@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../../lib/prisma"
 import { addDays } from "date-fns"
-import { requireAuth } from "../../../lib/auth-api"
+import { getAuthSession, requireAuth } from "../../../lib/auth-api"
 import { removeGestantesComDppVencida } from "../../../lib/gestantes"
 
 // GET - Listar todas as gestantes
@@ -9,9 +9,26 @@ export async function GET(request: NextRequest) {
   const authError = await requireAuth(request)
   if (authError) return authError
   try {
+    const session = await getAuthSession()
+    if (!session?.user) {
+      return NextResponse.json({ error: "Sessão não encontrada" }, { status: 401 })
+    }
+
+    if (!session.user.isAdmin && !session.user.ubsId) {
+      return NextResponse.json(
+        { error: "Profissional sem UBS associada" },
+        { status: 400 }
+      )
+    }
+
+    const whereClause = session.user.isAdmin
+      ? undefined
+      : { ubsId: session.user.ubsId! }
+
     await removeGestantesComDppVencida()
     console.log("Iniciando busca de gestantes...")
     const gestantes = await prisma.gestante.findMany({
+      where: whereClause,
       include: {
         ubs: {
           select: {
@@ -62,6 +79,11 @@ export async function POST(request: NextRequest) {
   if (authError) return authError
 
   try {
+    const session = await getAuthSession()
+    if (!session?.user) {
+      return NextResponse.json({ error: "Sessão não encontrada" }, { status: 401 })
+    }
+
     const body = await request.json()
     const {
       nome,
@@ -90,7 +112,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!ubsId) {
+    const ubsDestino = session.user.isAdmin ? ubsId : session.user.ubsId
+
+    if (!ubsDestino) {
       return NextResponse.json(
         { error: "UBS é obrigatória" },
         { 
@@ -109,7 +133,7 @@ export async function POST(request: NextRequest) {
       data: {
         nome,
         cartaoSus,
-        ubsId,
+        ubsId: ubsDestino,
         dum: new Date(dum),
         dpp,
         etnia,
