@@ -44,12 +44,14 @@ export const authOptions: NextAuthOptions = {
             return null
           }
 
+          const ubsId = enfermeiro.ubsId ?? undefined
+
           return {
             id: enfermeiro.id,
             email: enfermeiro.email,
             name: enfermeiro.nome,
             isAdmin: enfermeiro.isAdmin,
-            ubsId: enfermeiro.ubsId,
+            ubsId,
           }
         } catch (error) {
           console.error("Erro no authorize:", error)
@@ -69,7 +71,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
         token.isAdmin = user.isAdmin
-        token.ubsId = user.ubsId
+        token.ubsId = user.ubsId ?? undefined
       }
       return token
     },

@@ -59,12 +59,12 @@ export async function GET(request: NextRequest) {
     // Estatísticas do relatório
     const total = gestantes.length
     const porRisco = {
-      baixo: gestantes.filter((g) => g.risco === "Risco Baixo").length,
-      intermediario: gestantes.filter((g) => g.risco === "Risco Intermediário").length,
-      alto: gestantes.filter((g) => g.risco === "Risco Alto").length,
+      baixo: gestantes.filter((g: typeof gestantes[number]) => g.risco === "Risco Baixo").length,
+      intermediario: gestantes.filter((g: typeof gestantes[number]) => g.risco === "Risco Intermediário").length,
+      alto: gestantes.filter((g: typeof gestantes[number]) => g.risco === "Risco Alto").length,
     }
 
-    const porEtnia = gestantes.reduce((acc, g) => {
+    const porEtnia = gestantes.reduce((acc, g: typeof gestantes[number]) => {
       acc[g.etnia] = (acc[g.etnia] || 0) + 1
       return acc
     }, {} as Record<string, number>)
