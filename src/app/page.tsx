@@ -129,6 +129,15 @@ export default function Dashboard() {
     return new Date(dateString).toLocaleDateString("pt-BR")
   }
 
+  const calculateWeeks = (dum: string) => {
+    const dumDate = new Date(dum)
+    const today = new Date()
+    const diffTime = today.getTime() - dumDate.getTime()
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+    const weeks = Math.floor(diffDays / 7)
+    return weeks >= 0 ? weeks : 0
+  }
+
   const itemsPerPage = 10
   const totalPages = Math.max(1, Math.ceil(gestantes.length / itemsPerPage))
   const currentPage = Math.min(page, totalPages)
@@ -330,7 +339,7 @@ export default function Dashboard() {
                     <th className="text-left p-4 font-semibold text-gray-700">Nome</th>
                     <th className="text-left p-4 font-semibold text-gray-700">DUM</th>
                     <th className="text-left p-4 font-semibold text-gray-700">DPP</th>
-                    <th className="text-left p-4 font-semibold text-gray-700">Etnia</th>
+                    <th className="text-left p-4 font-semibold text-gray-700">Semanas de Gestação</th>
                     <th className="text-left p-4 font-semibold text-gray-700">Risco</th>
                     <th className="text-left p-4 font-semibold text-gray-700">Ações</th>
                   </tr>
@@ -341,7 +350,7 @@ export default function Dashboard() {
                       <td className="p-4 font-medium">{gestante.nome}</td>
                       <td className="p-4">{formatDate(gestante.dum)}</td>
                       <td className="p-4">{formatDate(gestante.dpp)}</td>
-                      <td className="p-4">{gestante.etnia}</td>
+                      <td className="p-4">{calculateWeeks(gestante.dum)} semanas</td>
                       <td className="p-4">
                         <span
                           className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${getRiscoColor(
