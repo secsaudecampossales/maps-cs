@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useSession } from "next-auth/react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, Edit, Users, AlertTriangle, Baby, Trash2 } from "lucide-react"
+import { Plus, Edit, Users, AlertTriangle, AlertCircle, Baby, Trash2 } from "lucide-react"
 
 interface Gestante {
   id: string
@@ -20,6 +20,7 @@ interface Gestante {
 interface Stats {
   totalGestantes: number
   gestantesAltoRisco: number
+  gestantesRiscoIntermediario: number
   partosEsteMes: number
 }
 
@@ -29,6 +30,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState<Stats>({
     totalGestantes: 0,
     gestantesAltoRisco: 0,
+    gestantesRiscoIntermediario: 0,
     partosEsteMes: 0,
   })
   const [loading, setLoading] = useState(true)
@@ -100,6 +102,7 @@ export default function Dashboard() {
       setStats({
         totalGestantes: 0,
         gestantesAltoRisco: 0,
+        gestantesRiscoIntermediario: 0,
         partosEsteMes: 0,
       })
     } finally {
@@ -237,7 +240,7 @@ export default function Dashboard() {
       </div>
 
       {/* Cards de Estatísticas */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de Gestantes</CardTitle>
@@ -260,6 +263,21 @@ export default function Dashboard() {
             <div className="text-3xl font-bold text-red-600">{stats.gestantesAltoRisco}</div>
             <p className="text-xs text-muted-foreground mt-1">
               Requerem atenção especial
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Risco Intermediário</CardTitle>
+            <AlertCircle className="h-4 w-4 text-yellow-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-yellow-600">
+              {stats.gestantesRiscoIntermediario}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Monitoramento reforçado
             </p>
           </CardContent>
         </Card>

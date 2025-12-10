@@ -38,6 +38,13 @@ export async function GET(request: NextRequest) {
       },
     })
 
+    const gestantesRiscoIntermediario = await prisma.gestante.count({
+      where: {
+        ...whereClause,
+        risco: "Risco Intermediário",
+      },
+    })
+
     // Contar partos deste mês (DPP no mês atual)
     const inicioMes = startOfMonth(new Date())
     const fimMes = endOfMonth(new Date())
@@ -55,6 +62,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       totalGestantes,
       gestantesAltoRisco,
+      gestantesRiscoIntermediario,
       partosEsteMes,
     }, {
       headers: {
