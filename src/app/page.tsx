@@ -236,17 +236,17 @@ export default function Dashboard() {
           <p className="text-gray-600 mt-2">Monitoramento de Gestantes - APS Campos Sales</p>
         </div>
         <div className="flex gap-2">
-          {session?.user?.isAdmin && (
-            <Button
-              variant="destructive"
-              className="gap-2"
-              onClick={() => setShowCleanupConfirm(true)}
-              disabled={cleaning}
-            >
-              <Trash2 className="h-4 w-4" />
-              {cleaning ? "Removendo..." : "Remover Ex-Gestantes"}
-            </Button>
-          )}
+          {/* {session?.user?.isAdmin && (
+            // <Button
+            //   variant="destructive"
+            //   className="gap-2"
+            //   onClick={() => setShowCleanupConfirm(true)}
+            //   disabled={cleaning}
+            // >
+            //   <Trash2 className="h-4 w-4" />
+            //   {cleaning ? "Removendo..." : "Remover Ex-Gestantes"}
+            // </Button>
+          )} */}
           <Link href="/gestantes/novo">
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
