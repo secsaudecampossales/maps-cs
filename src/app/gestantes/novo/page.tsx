@@ -368,6 +368,7 @@ export default function NovaGestantePage() {
                           exames: { ...formData.exames, rotina1: checked === true },
                         })
                       }
+                      className="shadow-sm shadow-black"
                     />
                     <Label htmlFor="rotina1" className="cursor-pointer">
                       1º Trimestre
@@ -383,6 +384,7 @@ export default function NovaGestantePage() {
                           exames: { ...formData.exames, rotina2: checked === true },
                         })
                       }
+                      className="shadow-sm shadow-black"
                     />
                     <Label htmlFor="rotina2" className="cursor-pointer">
                       2º Trimestre
@@ -398,6 +400,7 @@ export default function NovaGestantePage() {
                           exames: { ...formData.exames, rotina3: checked === true },
                         })
                       }
+                      className="shadow-sm shadow-black"
                     />
                     <Label htmlFor="rotina3" className="cursor-pointer">
                       3º Trimestre
@@ -420,6 +423,7 @@ export default function NovaGestantePage() {
                           exames: { ...formData.exames, ultrassom1: checked === true },
                         })
                       }
+                      className="shadow-sm shadow-black"
                     />
                     <Label htmlFor="ultrassom1" className="cursor-pointer">
                       1º Trimestre
@@ -435,6 +439,7 @@ export default function NovaGestantePage() {
                           exames: { ...formData.exames, ultrassom2: checked === true },
                         })
                       }
+                      className="shadow-sm shadow-black"
                     />
                     <Label htmlFor="ultrassom2" className="cursor-pointer">
                       2º Trimestre
@@ -450,6 +455,7 @@ export default function NovaGestantePage() {
                           exames: { ...formData.exames, ultrassom3: checked === true },
                         })
                       }
+                      className="shadow-sm shadow-black"
                     />
                     <Label htmlFor="ultrassom3" className="cursor-pointer">
                       3º Trimestre
@@ -476,6 +482,7 @@ export default function NovaGestantePage() {
                   onCheckedChange={(checked) =>
                     setFormData({ ...formData, vacinas: { ...formData.vacinas, hb: checked === true } })
                   }
+                  className="shadow-sm shadow-black"
                 />
                 <Label htmlFor="vacina-hb" className="cursor-pointer">
                   HB - Hepatite B
@@ -488,6 +495,7 @@ export default function NovaGestantePage() {
                   onCheckedChange={(checked) =>
                     setFormData({ ...formData, vacinas: { ...formData.vacinas, dt: checked === true } })
                   }
+                  className="shadow-sm shadow-black"
                 />
                 <Label htmlFor="vacina-dt" className="cursor-pointer">
                   DT - Dupla Adulto
@@ -503,6 +511,7 @@ export default function NovaGestantePage() {
                       vacinas: { ...formData.vacinas, influenza: checked === true },
                     })
                   }
+                  className="shadow-sm shadow-black"
                 />
                 <Label htmlFor="vacina-influenza" className="cursor-pointer">
                   Influenza
@@ -518,6 +527,7 @@ export default function NovaGestantePage() {
                       vacinas: { ...formData.vacinas, covid19: checked === true },
                     })
                   }
+                  className="shadow-sm shadow-black"
                 />
                 <Label htmlFor="vacina-covid" className="cursor-pointer">
                   Covid-19
@@ -533,6 +543,7 @@ export default function NovaGestantePage() {
                       vacinas: { ...formData.vacinas, dtpa20Semana: checked === true },
                     })
                   }
+                  className="shadow-sm shadow-black"
                 />
                 <Label htmlFor="vacina-dtpa" className="cursor-pointer">
                   DTPA - 20º semana gestacional
@@ -548,6 +559,7 @@ export default function NovaGestantePage() {
                       vacinas: { ...formData.vacinas, vsr28Semana: checked === true },
                     })
                   }
+                  className="shadow-sm shadow-black"
                 />
                 <Label htmlFor="vacina-vsr" className="cursor-pointer">
                   VSR - Vírus Sincicial Respiratório 28º semana gestacional

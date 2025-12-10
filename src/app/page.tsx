@@ -27,6 +27,7 @@ interface Stats {
 export default function Dashboard() {
   const { data: session } = useSession()
   const [gestantes, setGestantes] = useState<Gestante[]>([])
+  const [page, setPage] = useState(1)
   const [stats, setStats] = useState<Stats>({
     totalGestantes: 0,
     gestantesAltoRisco: 0,
@@ -94,6 +95,7 @@ export default function Dashboard() {
       }
 
       setGestantes(gestantesData)
+      setPage(1)
       setStats(statsData)
     } catch (error) {
       console.error("Erro ao carregar dados:", error)
@@ -126,6 +128,12 @@ export default function Dashboard() {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("pt-BR")
   }
+
+  const itemsPerPage = 10
+  const totalPages = Math.max(1, Math.ceil(gestantes.length / itemsPerPage))
+  const currentPage = Math.min(page, totalPages)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const paginatedGestantes = gestantes.slice(startIndex, startIndex + itemsPerPage)
 
   const handleDelete = async (gestanteId: string) => {
     const gestante = gestantes.find((g) => g.id === gestanteId)
@@ -328,7 +336,7 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {gestantes.map((gestante) => (
+                  {paginatedGestantes.map((gestante) => (
                     <tr key={gestante.id} className="border-b hover:bg-gray-50">
                       <td className="p-4 font-medium">{gestante.nome}</td>
                       <td className="p-4">{formatDate(gestante.dum)}</td>
@@ -345,16 +353,16 @@ export default function Dashboard() {
                       </td>
                       <td className="p-4">
                         <div className="flex gap-2">
-                          <Link href={`/gestantes/${gestante.id}`}>
-                            <Button variant="outline" size="sm" className="gap-2">
-                              <Edit className="h-3 w-3" />
-                              Editar
-                            </Button>
-                          </Link>
                           <Link href={`/gestantes/${gestante.id}/visualizar`}>
                             <Button variant="outline" size="sm" className="gap-2 bg-blue-500 text-white">
                               <Eye className="h-3 w-3" />
                               Ver
+                            </Button>
+                          </Link>
+                          <Link href={`/gestantes/${gestante.id}`}>
+                            <Button variant="outline" size="sm" className="gap-2">
+                              <Edit className="h-3 w-3" />
+                              Editar
                             </Button>
                           </Link>
                           <Button
@@ -373,6 +381,36 @@ export default function Dashboard() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+          {!loading && gestantes.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 mt-4 justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                Anterior
+              </Button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => (
+                <Button
+                  key={pageNumber}
+                  variant={pageNumber === currentPage ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setPage(pageNumber)}
+                >
+                  {pageNumber}
+                </Button>
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Próxima
+              </Button>
             </div>
           )}
         </CardContent>
