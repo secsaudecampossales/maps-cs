@@ -47,6 +47,15 @@ const formatDate = (value: string) => new Date(value).toLocaleDateString("pt-BR"
 
 const yesNo = (value: boolean) => (value ? "Sim" : "Não")
 
+const calculateWeeks = (dum: string) => {
+  const dumDate = new Date(dum)
+  const today = new Date()
+  const diffTime = today.getTime() - dumDate.getTime()
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+  const weeks = Math.floor(diffDays / 7)
+  return weeks >= 0 ? weeks : 0
+}
+
 export default function VisualizarGestantePage() {
   const params = useParams()
   const id = params.id as string
@@ -124,6 +133,7 @@ export default function VisualizarGestantePage() {
           <InfoItem label="Cartão SUS" value={formatCartaoSus(gestante.cartaoSus || "")} />
           <InfoItem label="DUM" value={formatDate(gestante.dum)} />
           <InfoItem label="DPP" value={formatDate(gestante.dpp)} />
+          <InfoItem label="Semanas de Gestação" value={`${calculateWeeks(gestante.dum)} semanas`} />
           <InfoItem label="Etnia" value={gestante.etnia} />
           <InfoItem label="Gestações Anteriores" value={gestante.gestacoesAnteriores.toString()} />
         </CardContent>
