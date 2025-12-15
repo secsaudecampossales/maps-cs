@@ -45,7 +45,7 @@ export default function Dashboard() {
    const [searchTerm, setSearchTerm] = useState("")
    const [showFilters, setShowFilters] = useState(false)
    const [riskFilter, setRiskFilter] = useState<"all" | "alto" | "intermediario">("all")
-   const [partoFilter, setPartoFilter] = useState<"all" | "ultimos3Meses">("all")
+   const [partoFilter, setPartoFilter] = useState<"all" | "ultimos3Meses" | "estemes">("all")
   const [stats, setStats] = useState<Stats>({
     totalGestantes: 0,
     gestantesAltoRisco: 0,
@@ -167,6 +167,12 @@ export default function Dashboard() {
     return dppDate >= threeMonthsAgo && dppDate <= today
   }
 
+  const isPartoEsteMes = (dpp: string) => {
+    const dppDate = new Date(dpp)
+    const today = new Date()
+    return dppDate.getMonth() === today.getMonth() && dppDate.getFullYear() === today.getFullYear()
+  }
+
   const filteredGestantes = gestantes.filter((gestante) => {
     const term = searchTerm.trim().toLowerCase()
 
@@ -181,7 +187,7 @@ export default function Dashboard() {
       (riskFilter === "intermediario" && gestante.risco === "Risco Intermediário")
 
     const matchesParto =
-      partoFilter === "all" || (partoFilter === "ultimos3Meses" && isPartoUltimos3Meses(gestante.dpp))
+      partoFilter === "all" || (partoFilter === "ultimos3Meses" && isPartoUltimos3Meses(gestante.dpp)) || (partoFilter === "estemes" && isPartoEsteMes(gestante.dpp))
 
     return matchesSearch && matchesRisco && matchesParto
   })
@@ -422,7 +428,7 @@ export default function Dashboard() {
             </div>
           </div>
           {showFilters && (
-            <div className="mt-4 grid gap-2 md:grid-cols-3">
+            <div className="mt-4 grid gap-2 md:grid-cols-4">
               <Button
                 type="button"
                 variant={riskFilter === "alto" ? "default" : "outline"}
@@ -448,6 +454,19 @@ export default function Dashboard() {
                 }}
               >
                 Gestantes de risco intermediário
+              </Button>
+              <Button
+                type="button"
+                variant={partoFilter === "estemes" ? "default" : "outline"}
+                size="sm"
+                className="justify-start"
+                onClick={() => {
+                  setPartoFilter((current) => (current === "estemes" ? "all" : "estemes"))
+                  setRiskFilter("all")
+                  setPage(1)
+                }}
+              >
+                Partos Este Mês
               </Button>
               <Button
                 type="button"
