@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { requireAdmin } from "../../../../../lib/auth-api"
-import { removeGestantesComDppVencida } from "../../../../../lib/gestantes"
+import { removeGestantesPosTresMeses } from "../../../../../lib/gestantes"
 
 export async function POST(request: NextRequest) {
   const authError = await requireAdmin(request)
   if (authError) return authError
 
   try {
-    const removidas = await removeGestantesComDppVencida()
+    const removidas = await removeGestantesPosTresMeses()
     return NextResponse.json(
       { removidas, message: "Gestantes com DPP vencida removidas" },
       {

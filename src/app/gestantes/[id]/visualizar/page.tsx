@@ -134,6 +134,7 @@ export default function VisualizarGestantePage() {
           <InfoItem label="DUM" value={formatDate(gestante.dum)} />
           <InfoItem label="DPP" value={formatDate(gestante.dpp)} />
           <InfoItem label="Semanas de Gestação" value={`${calculateWeeks(gestante.dum)} semanas`} />
+          <InfoItem label="UBS" value={gestante.ubsId} />
           <InfoItem label="Etnia" value={gestante.etnia} />
           <InfoItem label="Gestações Anteriores" value={gestante.gestacoesAnteriores.toString()} />
         </CardContent>

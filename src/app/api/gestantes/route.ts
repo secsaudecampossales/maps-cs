@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../../lib/prisma"
 import { addDays } from "date-fns"
 import { getAuthSession, requireAuth } from "../../../lib/auth-api"
-import { removeGestantesComDppVencida } from "../../../lib/gestantes"
+import { removeGestantesPosTresMeses } from "../../../lib/gestantes"
 
 // GET - Listar todas as gestantes
 export async function GET(request: NextRequest) {
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       ? undefined
       : { ubsId: session.user.ubsId! }
 
-    await removeGestantesComDppVencida()
+    await removeGestantesPosTresMeses()
     console.log("Iniciando busca de gestantes...")
     const gestantes = await prisma.gestante.findMany({
       where: whereClause,

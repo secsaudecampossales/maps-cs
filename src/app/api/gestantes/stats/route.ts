@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../../../lib/prisma"
 import { startOfMonth, endOfMonth } from "date-fns"
 import { getAuthSession, requireAuth } from "../../../../lib/auth-api"
-import { removeGestantesComDppVencida } from "../../../../lib/gestantes"
+import { removeGestantesPosTresMeses } from "../../../../lib/gestantes"
 
 // GET - Estatísticas das gestantes
 export async function GET(request: NextRequest) {
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       ? undefined
       : { ubsId: session.user.ubsId! }
 
-    await removeGestantesComDppVencida()
+    await removeGestantesPosTresMeses()
     const totalGestantes = await prisma.gestante.count({
       where: whereClause,
     })
@@ -59,11 +59,26 @@ export async function GET(request: NextRequest) {
       },
     })
 
+    // Contar partos dos últimos 3 meses
+    const tresMesesAtras = new Date()
+    tresMesesAtras.setMonth(tresMesesAtras.getMonth() - 3)
+
+    const partosDosUltimos3Meses = await prisma.gestante.count({
+      where: {
+        ...whereClause,
+        dpp: {
+          gte: tresMesesAtras,
+          lte: new Date(),
+        },
+      },
+    })
+
     return NextResponse.json({
       totalGestantes,
       gestantesAltoRisco,
       gestantesRiscoIntermediario,
       partosEsteMes,
+      partosDosUltimos3Meses,
     }, {
       headers: {
         'Content-Type': 'application/json',
