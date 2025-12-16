@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { FileDown, Filter, BarChart3 } from "lucide-react"
+import { FileDown, Filter, BarChart3, ChevronDown, ChevronUp } from "lucide-react"
 import Link from "next/link"
 
 interface UBS {
@@ -27,6 +27,22 @@ interface RelatorioData {
       alto: number
     }
     porEtnia: Record<string, number>
+    exames?: {
+      exameRotina1Trimestre: number
+      exameRotina2Trimestre: number
+      exameRotina3Trimestre: number
+      ultrassom1Trimestre: number
+      ultrassom2Trimestre: number
+      ultrassom3Trimestre: number
+    }
+    vacinas?: {
+      vacinaHB: number
+      vacinaDT: number
+      vacinaInfluenza: number
+      vacinaCovid19: number
+      vacinaDTPA20Semana: number
+      vacinaVSR28Semana: number
+    }
   }
   filtros: {
     ubsId: string | null
@@ -34,6 +50,7 @@ interface RelatorioData {
     etnia: string | null
     dataInicio: string | null
     dataFim: string | null
+    [key: string]: string | null
   }
 }
 
@@ -43,12 +60,37 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false)
   const [ubsList, setUbsList] = useState<UBS[]>([])
   const [relatorio, setRelatorio] = useState<RelatorioData | null>(null)
+  const [showFiltrosAvancados, setShowFiltrosAvancados] = useState(false)
+  const [showFiltrosExames, setShowFiltrosExames] = useState(false)
+  const [showFiltrosVacinas, setShowFiltrosVacinas] = useState(false)
   const [filtros, setFiltros] = useState({
     ubsId: "",
     risco: "",
     etnia: "",
     dataInicio: "",
     dataFim: "",
+    dumInicio: "",
+    dumFim: "",
+    dppInicio: "",
+    dppFim: "",
+    gestacoesMin: "",
+    gestacoesMax: "",
+    semanasMin: "",
+    semanasMax: "",
+    exameRotina1Trimestre: "",
+    exameRotina2Trimestre: "",
+    exameRotina3Trimestre: "",
+    ultrassom1Trimestre: "",
+    ultrassom2Trimestre: "",
+    ultrassom3Trimestre: "",
+    vacinaHB: "",
+    vacinaDT: "",
+    vacinaInfluenza: "",
+    vacinaCovid19: "",
+    vacinaDTPA20Semana: "",
+    vacinaVSR28Semana: "",
+    partoEsteMes: "",
+    partoProximos3Meses: "",
   })
 
   useEffect(() => {
@@ -86,6 +128,28 @@ export default function AdminPage() {
       if (filtros.etnia) params.append("etnia", filtros.etnia)
       if (filtros.dataInicio) params.append("dataInicio", filtros.dataInicio)
       if (filtros.dataFim) params.append("dataFim", filtros.dataFim)
+      if (filtros.dumInicio) params.append("dumInicio", filtros.dumInicio)
+      if (filtros.dumFim) params.append("dumFim", filtros.dumFim)
+      if (filtros.dppInicio) params.append("dppInicio", filtros.dppInicio)
+      if (filtros.dppFim) params.append("dppFim", filtros.dppFim)
+      if (filtros.gestacoesMin) params.append("gestacoesMin", filtros.gestacoesMin)
+      if (filtros.gestacoesMax) params.append("gestacoesMax", filtros.gestacoesMax)
+      if (filtros.semanasMin) params.append("semanasMin", filtros.semanasMin)
+      if (filtros.semanasMax) params.append("semanasMax", filtros.semanasMax)
+      if (filtros.exameRotina1Trimestre === "true") params.append("exameRotina1Trimestre", "true")
+      if (filtros.exameRotina2Trimestre === "true") params.append("exameRotina2Trimestre", "true")
+      if (filtros.exameRotina3Trimestre === "true") params.append("exameRotina3Trimestre", "true")
+      if (filtros.ultrassom1Trimestre === "true") params.append("ultrassom1Trimestre", "true")
+      if (filtros.ultrassom2Trimestre === "true") params.append("ultrassom2Trimestre", "true")
+      if (filtros.ultrassom3Trimestre === "true") params.append("ultrassom3Trimestre", "true")
+      if (filtros.vacinaHB === "true") params.append("vacinaHB", "true")
+      if (filtros.vacinaDT === "true") params.append("vacinaDT", "true")
+      if (filtros.vacinaInfluenza === "true") params.append("vacinaInfluenza", "true")
+      if (filtros.vacinaCovid19 === "true") params.append("vacinaCovid19", "true")
+      if (filtros.vacinaDTPA20Semana === "true") params.append("vacinaDTPA20Semana", "true")
+      if (filtros.vacinaVSR28Semana === "true") params.append("vacinaVSR28Semana", "true")
+      if (filtros.partoEsteMes === "true") params.append("partoEsteMes", "true")
+      if (filtros.partoProximos3Meses === "true") params.append("partoProximos3Meses", "true")
 
       const response = await fetch(`/api/admin/relatorios?${params.toString()}`)
       if (response.ok) {
@@ -109,6 +173,28 @@ export default function AdminPage() {
       etnia: "",
       dataInicio: "",
       dataFim: "",
+      dumInicio: "",
+      dumFim: "",
+      dppInicio: "",
+      dppFim: "",
+      gestacoesMin: "",
+      gestacoesMax: "",
+      semanasMin: "",
+      semanasMax: "",
+      exameRotina1Trimestre: "",
+      exameRotina2Trimestre: "",
+      exameRotina3Trimestre: "",
+      ultrassom1Trimestre: "",
+      ultrassom2Trimestre: "",
+      ultrassom3Trimestre: "",
+      vacinaHB: "",
+      vacinaDT: "",
+      vacinaInfluenza: "",
+      vacinaCovid19: "",
+      vacinaDTPA20Semana: "",
+      vacinaVSR28Semana: "",
+      partoEsteMes: "",
+      partoProximos3Meses: "",
     })
     setRelatorio(null)
   }
@@ -119,29 +205,61 @@ export default function AdminPage() {
     const headers = [
       "Nome",
       "Cartão SUS",
+      "UBS",
+      "Endereço UBS",
       "DUM",
       "DPP",
+      "Semanas de Gestação",
       "Etnia",
       "Gestações Anteriores",
       "Risco",
       "Descrição Risco",
       "Motivo Alto Risco",
+      "Exame Rotina 1º Trimestre",
+      "Exame Rotina 2º Trimestre",
+      "Exame Rotina 3º Trimestre",
+      "Ultrassom 1º Trimestre",
+      "Ultrassom 2º Trimestre",
+      "Ultrassom 3º Trimestre",
+      "Vacina HB",
+      "Vacina DT",
+      "Vacina Influenza",
+      "Vacina COVID-19",
+      "Vacina DTPA (20 semanas)",
+      "Vacina VSR (28 semanas)",
+      "Data de Cadastro",
     ]
 
     const rows = relatorio.gestantes.map((g) => [
       g.nome,
       g.cartaoSus,
+      g.nomeUBS || g.ubs?.nome || "",
+      g.enderecoUBS || g.ubs?.endereco || "",
       new Date(g.dum).toLocaleDateString("pt-BR"),
       new Date(g.dpp).toLocaleDateString("pt-BR"),
+      g.semanasGestacao || "",
       g.etnia,
       g.gestacoesAnteriores,
       g.risco,
       g.descricaoRisco || "",
       g.motivoAltoRisco || "",
+      g.exameRotina1Trimestre ? "Sim" : "Não",
+      g.exameRotina2Trimestre ? "Sim" : "Não",
+      g.exameRotina3Trimestre ? "Sim" : "Não",
+      g.ultrassom1Trimestre ? "Sim" : "Não",
+      g.ultrassom2Trimestre ? "Sim" : "Não",
+      g.ultrassom3Trimestre ? "Sim" : "Não",
+      g.vacinaHB ? "Sim" : "Não",
+      g.vacinaDT ? "Sim" : "Não",
+      g.vacinaInfluenza ? "Sim" : "Não",
+      g.vacinaCovid19 ? "Sim" : "Não",
+      g.vacinaDTPA20Semana ? "Sim" : "Não",
+      g.vacinaVSR28Semana ? "Sim" : "Não",
+      new Date(g.createdAt).toLocaleDateString("pt-BR"),
     ])
 
     const csvContent = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${cell}"`).join(","))
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
       .join("\n")
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
@@ -256,7 +374,7 @@ export default function AdminPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="dataFim">Data Fim</Label>
+              <Label htmlFor="dataFim">Data Fim (Cadastro)</Label>
               <Input
                 id="dataFim"
                 type="date"
@@ -264,6 +382,345 @@ export default function AdminPage() {
                 onChange={(e) => setFiltros({ ...filtros, dataFim: e.target.value })}
               />
             </div>
+          </div>
+
+          {/* Filtros Avançados - Datas e Gestação */}
+          <div className="mt-4">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setShowFiltrosAvancados(!showFiltrosAvancados)}
+              className="w-full justify-between"
+            >
+              <span className="font-medium">Filtros Avançados - Datas e Gestação</span>
+              {showFiltrosAvancados ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+            {showFiltrosAvancados && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 pt-4 border-t">
+                <div className="space-y-2">
+                  <Label htmlFor="dumInicio">DUM Início</Label>
+                  <Input
+                    id="dumInicio"
+                    type="date"
+                    value={filtros.dumInicio}
+                    onChange={(e) => setFiltros({ ...filtros, dumInicio: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="dumFim">DUM Fim</Label>
+                  <Input
+                    id="dumFim"
+                    type="date"
+                    value={filtros.dumFim}
+                    onChange={(e) => setFiltros({ ...filtros, dumFim: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="dppInicio">DPP Início</Label>
+                  <Input
+                    id="dppInicio"
+                    type="date"
+                    value={filtros.dppInicio}
+                    onChange={(e) => setFiltros({ ...filtros, dppInicio: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="dppFim">DPP Fim</Label>
+                  <Input
+                    id="dppFim"
+                    type="date"
+                    value={filtros.dppFim}
+                    onChange={(e) => setFiltros({ ...filtros, dppFim: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gestacoesMin">Gestações Anteriores (Mín)</Label>
+                  <Input
+                    id="gestacoesMin"
+                    type="number"
+                    min="0"
+                    value={filtros.gestacoesMin}
+                    onChange={(e) => setFiltros({ ...filtros, gestacoesMin: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gestacoesMax">Gestações Anteriores (Máx)</Label>
+                  <Input
+                    id="gestacoesMax"
+                    type="number"
+                    min="0"
+                    value={filtros.gestacoesMax}
+                    onChange={(e) => setFiltros({ ...filtros, gestacoesMax: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="semanasMin">Semanas de Gestação (Mín)</Label>
+                  <Input
+                    id="semanasMin"
+                    type="number"
+                    min="0"
+                    max="42"
+                    value={filtros.semanasMin}
+                    onChange={(e) => setFiltros({ ...filtros, semanasMin: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="semanasMax">Semanas de Gestação (Máx)</Label>
+                  <Input
+                    id="semanasMax"
+                    type="number"
+                    min="0"
+                    max="42"
+                    value={filtros.semanasMax}
+                    onChange={(e) => setFiltros({ ...filtros, semanasMax: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="partoEsteMes">Parto Este Mês</Label>
+                  <Select
+                    value={filtros.partoEsteMes ? filtros.partoEsteMes : undefined}
+                    onValueChange={(value) => setFiltros({ ...filtros, partoEsteMes: value === "none" ? "" : value, partoProximos3Meses: "" })}
+                  >
+                    <SelectTrigger id="partoEsteMes">
+                      <SelectValue placeholder="Não filtrar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Não filtrar</SelectItem>
+                      <SelectItem value="true">Sim</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="partoProximos3Meses">Parto Próximos 3 Meses</Label>
+                  <Select
+                    value={filtros.partoProximos3Meses ? filtros.partoProximos3Meses : undefined}
+                    onValueChange={(value) => setFiltros({ ...filtros, partoProximos3Meses: value === "none" ? "" : value, partoEsteMes: "" })}
+                  >
+                    <SelectTrigger id="partoProximos3Meses">
+                      <SelectValue placeholder="Não filtrar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Não filtrar</SelectItem>
+                      <SelectItem value="true">Sim</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Filtros de Exames */}
+          <div className="mt-4">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setShowFiltrosExames(!showFiltrosExames)}
+              className="w-full justify-between"
+            >
+              <span className="font-medium">Filtros de Exames</span>
+              {showFiltrosExames ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+            {showFiltrosExames && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 pt-4 border-t">
+                <div className="space-y-2">
+                  <Label htmlFor="exameRotina1Trimestre">Exame Rotina 1º Trimestre</Label>
+                  <Select
+                    value={filtros.exameRotina1Trimestre ? filtros.exameRotina1Trimestre : undefined}
+                    onValueChange={(value) => setFiltros({ ...filtros, exameRotina1Trimestre: value === "none" ? "" : value })}
+                  >
+                    <SelectTrigger id="exameRotina1Trimestre">
+                      <SelectValue placeholder="Não filtrar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Não filtrar</SelectItem>
+                      <SelectItem value="true">Realizado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="exameRotina2Trimestre">Exame Rotina 2º Trimestre</Label>
+                  <Select
+                    value={filtros.exameRotina2Trimestre ? filtros.exameRotina2Trimestre : undefined}
+                    onValueChange={(value) => setFiltros({ ...filtros, exameRotina2Trimestre: value === "none" ? "" : value })}
+                  >
+                    <SelectTrigger id="exameRotina2Trimestre">
+                      <SelectValue placeholder="Não filtrar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Não filtrar</SelectItem>
+                      <SelectItem value="true">Realizado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="exameRotina3Trimestre">Exame Rotina 3º Trimestre</Label>
+                  <Select
+                    value={filtros.exameRotina3Trimestre ? filtros.exameRotina3Trimestre : undefined}
+                    onValueChange={(value) => setFiltros({ ...filtros, exameRotina3Trimestre: value === "none" ? "" : value })}
+                  >
+                    <SelectTrigger id="exameRotina3Trimestre">
+                      <SelectValue placeholder="Não filtrar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Não filtrar</SelectItem>
+                      <SelectItem value="true">Realizado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ultrassom1Trimestre">Ultrassom 1º Trimestre</Label>
+                  <Select
+                    value={filtros.ultrassom1Trimestre ? filtros.ultrassom1Trimestre : undefined}
+                    onValueChange={(value) => setFiltros({ ...filtros, ultrassom1Trimestre: value === "none" ? "" : value })}
+                  >
+                    <SelectTrigger id="ultrassom1Trimestre">
+                      <SelectValue placeholder="Não filtrar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Não filtrar</SelectItem>
+                      <SelectItem value="true">Realizado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ultrassom2Trimestre">Ultrassom 2º Trimestre</Label>
+                  <Select
+                    value={filtros.ultrassom2Trimestre ? filtros.ultrassom2Trimestre : undefined}
+                    onValueChange={(value) => setFiltros({ ...filtros, ultrassom2Trimestre: value === "none" ? "" : value })}
+                  >
+                    <SelectTrigger id="ultrassom2Trimestre">
+                      <SelectValue placeholder="Não filtrar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Não filtrar</SelectItem>
+                      <SelectItem value="true">Realizado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ultrassom3Trimestre">Ultrassom 3º Trimestre</Label>
+                  <Select
+                    value={filtros.ultrassom3Trimestre ? filtros.ultrassom3Trimestre : undefined}
+                    onValueChange={(value) => setFiltros({ ...filtros, ultrassom3Trimestre: value === "none" ? "" : value })}
+                  >
+                    <SelectTrigger id="ultrassom3Trimestre">
+                      <SelectValue placeholder="Não filtrar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Não filtrar</SelectItem>
+                      <SelectItem value="true">Realizado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Filtros de Vacinas */}
+          <div className="mt-4">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setShowFiltrosVacinas(!showFiltrosVacinas)}
+              className="w-full justify-between"
+            >
+              <span className="font-medium">Filtros de Vacinas</span>
+              {showFiltrosVacinas ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+            {showFiltrosVacinas && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 pt-4 border-t">
+                <div className="space-y-2">
+                  <Label htmlFor="vacinaHB">Vacina HB</Label>
+                  <Select
+                    value={filtros.vacinaHB ? filtros.vacinaHB : undefined}
+                    onValueChange={(value) => setFiltros({ ...filtros, vacinaHB: value === "none" ? "" : value })}
+                  >
+                    <SelectTrigger id="vacinaHB">
+                      <SelectValue placeholder="Não filtrar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Não filtrar</SelectItem>
+                      <SelectItem value="true">Aplicada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="vacinaDT">Vacina DT</Label>
+                  <Select
+                    value={filtros.vacinaDT ? filtros.vacinaDT : undefined}
+                    onValueChange={(value) => setFiltros({ ...filtros, vacinaDT: value === "none" ? "" : value })}
+                  >
+                    <SelectTrigger id="vacinaDT">
+                      <SelectValue placeholder="Não filtrar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Não filtrar</SelectItem>
+                      <SelectItem value="true">Aplicada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="vacinaInfluenza">Vacina Influenza</Label>
+                  <Select
+                    value={filtros.vacinaInfluenza ? filtros.vacinaInfluenza : undefined}
+                    onValueChange={(value) => setFiltros({ ...filtros, vacinaInfluenza: value === "none" ? "" : value })}
+                  >
+                    <SelectTrigger id="vacinaInfluenza">
+                      <SelectValue placeholder="Não filtrar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Não filtrar</SelectItem>
+                      <SelectItem value="true">Aplicada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="vacinaCovid19">Vacina COVID-19</Label>
+                  <Select
+                    value={filtros.vacinaCovid19 ? filtros.vacinaCovid19 : undefined}
+                    onValueChange={(value) => setFiltros({ ...filtros, vacinaCovid19: value === "none" ? "" : value })}
+                  >
+                    <SelectTrigger id="vacinaCovid19">
+                      <SelectValue placeholder="Não filtrar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Não filtrar</SelectItem>
+                      <SelectItem value="true">Aplicada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="vacinaDTPA20Semana">Vacina DTPA (20 semanas)</Label>
+                  <Select
+                    value={filtros.vacinaDTPA20Semana ? filtros.vacinaDTPA20Semana : undefined}
+                    onValueChange={(value) => setFiltros({ ...filtros, vacinaDTPA20Semana: value === "none" ? "" : value })}
+                  >
+                    <SelectTrigger id="vacinaDTPA20Semana">
+                      <SelectValue placeholder="Não filtrar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Não filtrar</SelectItem>
+                      <SelectItem value="true">Aplicada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="vacinaVSR28Semana">Vacina VSR (28 semanas)</Label>
+                  <Select
+                    value={filtros.vacinaVSR28Semana ? filtros.vacinaVSR28Semana : undefined}
+                    onValueChange={(value) => setFiltros({ ...filtros, vacinaVSR28Semana: value === "none" ? "" : value })}
+                  >
+                    <SelectTrigger id="vacinaVSR28Semana">
+                      <SelectValue placeholder="Não filtrar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Não filtrar</SelectItem>
+                      <SelectItem value="true">Aplicada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex gap-4 mt-6">
@@ -297,31 +754,113 @@ export default function AdminPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="p-4 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-gray-600">Total</p>
-                  <p className="text-2xl font-bold text-blue-600">
-                    {relatorio.estatisticas.total}
-                  </p>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="p-4 bg-blue-50 rounded-lg">
+                    <p className="text-sm text-gray-600">Total</p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {relatorio.estatisticas.total}
+                    </p>
+                  </div>
+                  <div className="p-4 bg-green-50 rounded-lg">
+                    <p className="text-sm text-gray-600">Risco Baixo</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {relatorio.estatisticas.porRisco.baixo}
+                    </p>
+                  </div>
+                  <div className="p-4 bg-yellow-50 rounded-lg">
+                    <p className="text-sm text-gray-600">Risco Intermediário</p>
+                    <p className="text-2xl font-bold text-yellow-600">
+                      {relatorio.estatisticas.porRisco.intermediario}
+                    </p>
+                  </div>
+                  <div className="p-4 bg-red-50 rounded-lg">
+                    <p className="text-sm text-gray-600">Risco Alto</p>
+                    <p className="text-2xl font-bold text-red-600">
+                      {relatorio.estatisticas.porRisco.alto}
+                    </p>
+                  </div>
                 </div>
-                <div className="p-4 bg-green-50 rounded-lg">
-                  <p className="text-sm text-gray-600">Risco Baixo</p>
-                  <p className="text-2xl font-bold text-green-600">
-                    {relatorio.estatisticas.porRisco.baixo}
-                  </p>
-                </div>
-                <div className="p-4 bg-yellow-50 rounded-lg">
-                  <p className="text-sm text-gray-600">Risco Intermediário</p>
-                  <p className="text-2xl font-bold text-yellow-600">
-                    {relatorio.estatisticas.porRisco.intermediario}
-                  </p>
-                </div>
-                <div className="p-4 bg-red-50 rounded-lg">
-                  <p className="text-sm text-gray-600">Risco Alto</p>
-                  <p className="text-2xl font-bold text-red-600">
-                    {relatorio.estatisticas.porRisco.alto}
-                  </p>
-                </div>
+                {relatorio.estatisticas.exames && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <div className="p-3 bg-purple-50 rounded-lg">
+                      <p className="text-xs text-gray-600">Ex. Rotina 1º</p>
+                      <p className="text-lg font-bold text-purple-600">
+                        {relatorio.estatisticas.exames.exameRotina1Trimestre}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-purple-50 rounded-lg">
+                      <p className="text-xs text-gray-600">Ex. Rotina 2º</p>
+                      <p className="text-lg font-bold text-purple-600">
+                        {relatorio.estatisticas.exames.exameRotina2Trimestre}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-purple-50 rounded-lg">
+                      <p className="text-xs text-gray-600">Ex. Rotina 3º</p>
+                      <p className="text-lg font-bold text-purple-600">
+                        {relatorio.estatisticas.exames.exameRotina3Trimestre}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-indigo-50 rounded-lg">
+                      <p className="text-xs text-gray-600">USG 1º</p>
+                      <p className="text-lg font-bold text-indigo-600">
+                        {relatorio.estatisticas.exames.ultrassom1Trimestre}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-indigo-50 rounded-lg">
+                      <p className="text-xs text-gray-600">USG 2º</p>
+                      <p className="text-lg font-bold text-indigo-600">
+                        {relatorio.estatisticas.exames.ultrassom2Trimestre}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-indigo-50 rounded-lg">
+                      <p className="text-xs text-gray-600">USG 3º</p>
+                      <p className="text-lg font-bold text-indigo-600">
+                        {relatorio.estatisticas.exames.ultrassom3Trimestre}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {relatorio.estatisticas.vacinas && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <div className="p-3 bg-teal-50 rounded-lg">
+                      <p className="text-xs text-gray-600">Vacina HB</p>
+                      <p className="text-lg font-bold text-teal-600">
+                        {relatorio.estatisticas.vacinas.vacinaHB}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-teal-50 rounded-lg">
+                      <p className="text-xs text-gray-600">Vacina DT</p>
+                      <p className="text-lg font-bold text-teal-600">
+                        {relatorio.estatisticas.vacinas.vacinaDT}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-teal-50 rounded-lg">
+                      <p className="text-xs text-gray-600">Vacina Influenza</p>
+                      <p className="text-lg font-bold text-teal-600">
+                        {relatorio.estatisticas.vacinas.vacinaInfluenza}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-teal-50 rounded-lg">
+                      <p className="text-xs text-gray-600">Vacina COVID-19</p>
+                      <p className="text-lg font-bold text-teal-600">
+                        {relatorio.estatisticas.vacinas.vacinaCovid19}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-teal-50 rounded-lg">
+                      <p className="text-xs text-gray-600">Vacina DTPA</p>
+                      <p className="text-lg font-bold text-teal-600">
+                        {relatorio.estatisticas.vacinas.vacinaDTPA20Semana}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-teal-50 rounded-lg">
+                      <p className="text-xs text-gray-600">Vacina VSR</p>
+                      <p className="text-lg font-bold text-teal-600">
+                        {relatorio.estatisticas.vacinas.vacinaVSR28Semana}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -330,32 +869,55 @@ export default function AdminPage() {
           <Card>
             <CardHeader>
               <CardTitle>Gestantes do Relatório</CardTitle>
+              <CardDescription>
+                Role horizontalmente para ver todas as informações
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
+                <table className="w-full border-collapse min-w-[1400px]">
                   <thead>
-                    <tr className="border-b">
-                      <th className="text-left p-2">Nome</th>
-                      <th className="text-left p-2">Cartão SUS</th>
-                      <th className="text-left p-2">DUM</th>
-                      <th className="text-left p-2">DPP</th>
-                      <th className="text-left p-2">Etnia</th>
-                      <th className="text-left p-2">Risco</th>
+                    <tr className="border-b bg-gray-50">
+                      <th className="text-left p-2 font-semibold text-sm sticky left-0 bg-gray-50 z-10">Nome</th>
+                      <th className="text-left p-2 font-semibold text-sm">Cartão SUS</th>
+                      <th className="text-left p-2 font-semibold text-sm">UBS</th>
+                      <th className="text-left p-2 font-semibold text-sm">DUM</th>
+                      <th className="text-left p-2 font-semibold text-sm">DPP</th>
+                      <th className="text-left p-2 font-semibold text-sm">Semanas</th>
+                      <th className="text-left p-2 font-semibold text-sm">Etnia</th>
+                      <th className="text-left p-2 font-semibold text-sm">Gest. Ant.</th>
+                      <th className="text-left p-2 font-semibold text-sm">Risco</th>
+                      <th className="text-left p-2 font-semibold text-sm">Ex. Rot. 1º</th>
+                      <th className="text-left p-2 font-semibold text-sm">Ex. Rot. 2º</th>
+                      <th className="text-left p-2 font-semibold text-sm">Ex. Rot. 3º</th>
+                      <th className="text-left p-2 font-semibold text-sm">USG 1º</th>
+                      <th className="text-left p-2 font-semibold text-sm">USG 2º</th>
+                      <th className="text-left p-2 font-semibold text-sm">USG 3º</th>
+                      <th className="text-left p-2 font-semibold text-sm">Vac. HB</th>
+                      <th className="text-left p-2 font-semibold text-sm">Vac. DT</th>
+                      <th className="text-left p-2 font-semibold text-sm">Vac. Inf.</th>
+                      <th className="text-left p-2 font-semibold text-sm">Vac. COVID</th>
+                      <th className="text-left p-2 font-semibold text-sm">Vac. DTPA</th>
+                      <th className="text-left p-2 font-semibold text-sm">Vac. VSR</th>
                     </tr>
                   </thead>
                   <tbody>
                     {relatorio.gestantes.map((gestante) => (
                       <tr key={gestante.id} className="border-b hover:bg-gray-50">
-                        <td className="p-2">{gestante.nome}</td>
-                        <td className="p-2">{gestante.cartaoSus}</td>
-                        <td className="p-2">
+                        <td className="p-2 font-medium sticky left-0 bg-white z-10">{gestante.nome}</td>
+                        <td className="p-2 text-sm">{gestante.cartaoSus}</td>
+                        <td className="p-2 text-sm">{gestante.nomeUBS || gestante.ubs?.nome || "-"}</td>
+                        <td className="p-2 text-sm">
                           {new Date(gestante.dum).toLocaleDateString("pt-BR")}
                         </td>
-                        <td className="p-2">
+                        <td className="p-2 text-sm">
                           {new Date(gestante.dpp).toLocaleDateString("pt-BR")}
                         </td>
-                        <td className="p-2">{gestante.etnia}</td>
+                        <td className="p-2 text-sm font-medium">
+                          {gestante.semanasGestacao !== undefined ? `${gestante.semanasGestacao} sem` : "-"}
+                        </td>
+                        <td className="p-2 text-sm">{gestante.etnia}</td>
+                        <td className="p-2 text-sm text-center">{gestante.gestacoesAnteriores}</td>
                         <td className="p-2">
                           <span
                             className={`px-2 py-1 rounded text-xs ${
@@ -368,6 +930,90 @@ export default function AdminPage() {
                           >
                             {gestante.risco}
                           </span>
+                        </td>
+                        <td className="p-2 text-center">
+                          {gestante.exameRotina1Trimestre ? (
+                            <span className="text-green-600 font-bold">✓</span>
+                          ) : (
+                            <span className="text-gray-300">-</span>
+                          )}
+                        </td>
+                        <td className="p-2 text-center">
+                          {gestante.exameRotina2Trimestre ? (
+                            <span className="text-green-600 font-bold">✓</span>
+                          ) : (
+                            <span className="text-gray-300">-</span>
+                          )}
+                        </td>
+                        <td className="p-2 text-center">
+                          {gestante.exameRotina3Trimestre ? (
+                            <span className="text-green-600 font-bold">✓</span>
+                          ) : (
+                            <span className="text-gray-300">-</span>
+                          )}
+                        </td>
+                        <td className="p-2 text-center">
+                          {gestante.ultrassom1Trimestre ? (
+                            <span className="text-green-600 font-bold">✓</span>
+                          ) : (
+                            <span className="text-gray-300">-</span>
+                          )}
+                        </td>
+                        <td className="p-2 text-center">
+                          {gestante.ultrassom2Trimestre ? (
+                            <span className="text-green-600 font-bold">✓</span>
+                          ) : (
+                            <span className="text-gray-300">-</span>
+                          )}
+                        </td>
+                        <td className="p-2 text-center">
+                          {gestante.ultrassom3Trimestre ? (
+                            <span className="text-green-600 font-bold">✓</span>
+                          ) : (
+                            <span className="text-gray-300">-</span>
+                          )}
+                        </td>
+                        <td className="p-2 text-center">
+                          {gestante.vacinaHB ? (
+                            <span className="text-green-600 font-bold">✓</span>
+                          ) : (
+                            <span className="text-gray-300">-</span>
+                          )}
+                        </td>
+                        <td className="p-2 text-center">
+                          {gestante.vacinaDT ? (
+                            <span className="text-green-600 font-bold">✓</span>
+                          ) : (
+                            <span className="text-gray-300">-</span>
+                          )}
+                        </td>
+                        <td className="p-2 text-center">
+                          {gestante.vacinaInfluenza ? (
+                            <span className="text-green-600 font-bold">✓</span>
+                          ) : (
+                            <span className="text-gray-300">-</span>
+                          )}
+                        </td>
+                        <td className="p-2 text-center">
+                          {gestante.vacinaCovid19 ? (
+                            <span className="text-green-600 font-bold">✓</span>
+                          ) : (
+                            <span className="text-gray-300">-</span>
+                          )}
+                        </td>
+                        <td className="p-2 text-center">
+                          {gestante.vacinaDTPA20Semana ? (
+                            <span className="text-green-600 font-bold">✓</span>
+                          ) : (
+                            <span className="text-gray-300">-</span>
+                          )}
+                        </td>
+                        <td className="p-2 text-center">
+                          {gestante.vacinaVSR28Semana ? (
+                            <span className="text-green-600 font-bold">✓</span>
+                          ) : (
+                            <span className="text-gray-300">-</span>
+                          )}
                         </td>
                       </tr>
                     ))}
