@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { FileDown, Filter, BarChart3, ChevronDown, ChevronUp } from "lucide-react"
+import { FileDown, Filter, BarChart3, ChevronDown, ChevronUp, FileText } from "lucide-react"
 import Link from "next/link"
+import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"
 
 interface UBS {
   id: string
@@ -271,6 +273,150 @@ export default function AdminPage() {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  const exportarPDF = () => {
+    if (!relatorio) return
+
+    const doc = new jsPDF("landscape", "mm", "a4")
+    const pageWidth = doc.internal.pageSize.getWidth()
+    const pageHeight = doc.internal.pageSize.getHeight()
+    const margin = 10
+    let yPos = margin
+
+    // Cabeçalho
+    doc.setFontSize(18)
+    doc.setFont("helvetica", "bold")
+    doc.text("Relatório de Gestantes", pageWidth / 2, yPos, { align: "center" })
+    yPos += 8
+
+    doc.setFontSize(10)
+    doc.setFont("helvetica", "normal")
+    doc.text(
+      `Gerado em: ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR")}`,
+      pageWidth / 2,
+      yPos,
+      { align: "center" }
+    )
+    yPos += 10
+
+    // Estatísticas
+    doc.setFontSize(12)
+    doc.setFont("helvetica", "bold")
+    doc.text("Estatísticas do Relatório", margin, yPos)
+    yPos += 7
+
+    doc.setFontSize(10)
+    doc.setFont("helvetica", "normal")
+    doc.text(`Total de gestantes: ${relatorio.estatisticas.total}`, margin, yPos)
+    yPos += 5
+    doc.text(
+      `Risco Baixo: ${relatorio.estatisticas.porRisco.baixo} | Risco Intermediário: ${relatorio.estatisticas.porRisco.intermediario} | Risco Alto: ${relatorio.estatisticas.porRisco.alto}`,
+      margin,
+      yPos
+    )
+    yPos += 8
+
+    // Tabela de gestantes
+    const tableData = relatorio.gestantes.map((g) => [
+      g.nome || "-",
+      g.cartaoSus || "-",
+      (g.nomeUBS || g.ubs?.nome || "-").substring(0, 20),
+      new Date(g.dum).toLocaleDateString("pt-BR"),
+      new Date(g.dpp).toLocaleDateString("pt-BR"),
+      g.semanasGestacao?.toString() || "-",
+      g.etnia || "-",
+      g.gestacoesAnteriores?.toString() || "0",
+      g.risco || "-",
+      g.exameRotina1Trimestre ? "Sim" : "Não",
+      g.exameRotina2Trimestre ? "Sim" : "Não",
+      g.exameRotina3Trimestre ? "Sim" : "Não",
+      g.ultrassom1Trimestre ? "Sim" : "Não",
+      g.ultrassom2Trimestre ? "Sim" : "Não",
+      g.ultrassom3Trimestre ? "Sim" : "Não",
+      g.vacinaHB ? "Sim" : "Não",
+      g.vacinaDT ? "Sim" : "Não",
+      g.vacinaInfluenza ? "Sim" : "Não",
+      g.vacinaCovid19 ? "Sim" : "Não",
+      g.vacinaDTPA20Semana ? "Sim" : "Não",
+      g.vacinaVSR28Semana ? "Sim" : "Não",
+    ])
+
+    autoTable(doc, {
+      startY: yPos,
+      head: [
+        [
+          "Nome",
+          "Cartão SUS",
+          "UBS",
+          "DUM",
+          "DPP",
+          "Semanas",
+          "Etnia",
+          "Gest. Ant.",
+          "Risco",
+          "Ex. Rot. 1º",
+          "Ex. Rot. 2º",
+          "Ex. Rot. 3º",
+          "USG 1º",
+          "USG 2º",
+          "USG 3º",
+          "Vac. HB",
+          "Vac. DT",
+          "Vac. Inf.",
+          "Vac. COVID",
+          "Vac. DTPA",
+          "Vac. VSR",
+        ],
+      ],
+      body: tableData,
+      theme: "striped",
+      headStyles: { fillColor: [66, 139, 202], textColor: 255, fontStyle: "bold", fontSize: 7 },
+      bodyStyles: { fontSize: 7 },
+      styles: { cellPadding: 1.5, overflow: "linebreak" },
+      margin: { left: margin, right: margin },
+      columnStyles: {
+        0: { cellWidth: 30 },
+        1: { cellWidth: 25 },
+        2: { cellWidth: 25 },
+        3: { cellWidth: 20 },
+        4: { cellWidth: 20 },
+        5: { cellWidth: 15 },
+        6: { cellWidth: 20 },
+        7: { cellWidth: 15 },
+        8: { cellWidth: 20 },
+        9: { cellWidth: 15 },
+        10: { cellWidth: 15 },
+        11: { cellWidth: 15 },
+        12: { cellWidth: 15 },
+        13: { cellWidth: 15 },
+        14: { cellWidth: 15 },
+        15: { cellWidth: 15 },
+        16: { cellWidth: 15 },
+        17: { cellWidth: 15 },
+        18: { cellWidth: 15 },
+        19: { cellWidth: 15 },
+        20: { cellWidth: 15 },
+      },
+    })
+
+    // Rodapé em todas as páginas
+    const pageCount = doc.getNumberOfPages()
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i)
+      doc.setFontSize(8)
+      doc.setFont("helvetica", "italic")
+      doc.text(
+        `Página ${i} de ${pageCount}`,
+        pageWidth / 2,
+        pageHeight - margin,
+        { align: "center" }
+      )
+    }
+
+    // Salvar PDF
+    const fileName = `relatorio_gestantes_${new Date().toISOString().split("T")[0]}.pdf`
+    doc.save(fileName)
   }
 
   if (status === "loading") {
@@ -747,10 +893,16 @@ export default function AdminPage() {
                     {relatorio.estatisticas.total} gestante(s) encontrada(s)
                   </CardDescription>
                 </div>
-                <Button onClick={exportarCSV} variant="outline" className="gap-2">
-                  <FileDown className="h-4 w-4" />
-                  Exportar CSV
-                </Button>
+                <div className="flex gap-2">
+                  <Button onClick={exportarPDF} variant="outline" className="gap-2">
+                    <FileText className="h-4 w-4" />
+                    Exportar PDF
+                  </Button>
+                  <Button onClick={exportarCSV} variant="outline" className="gap-2">
+                    <FileDown className="h-4 w-4" />
+                    Exportar CSV
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
