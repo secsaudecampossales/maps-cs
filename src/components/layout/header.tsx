@@ -8,7 +8,7 @@ export function Header() {
   const { data: session } = useSession()
 
   return (
-    <header className="border-b bg-white shadow-sm">
+    <header className="border-b bg-white shadow-sm w-full flex justify-center">
       <div className="container px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2 ml-2">
               <Activity className="h-6 w-6 text-blue-600" />
