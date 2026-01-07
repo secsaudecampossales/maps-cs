@@ -185,6 +185,49 @@ export async function DELETE(
       )
     }
 
+    // Registrar a exclusão antes de deletar
+    try {
+      await prisma.gestanteExcluida.create({
+        data: {
+          nome: gestanteAtual.nome,
+          cartaoSus: gestanteAtual.cartaoSus,
+          ubsId: gestanteAtual.ubsId,
+          dum: gestanteAtual.dum,
+          dpp: gestanteAtual.dpp,
+          etnia: gestanteAtual.etnia,
+          gestacoesAnteriores: gestanteAtual.gestacoesAnteriores,
+          risco: gestanteAtual.risco,
+          descricaoRisco: gestanteAtual.descricaoRisco,
+          motivoAltoRisco: gestanteAtual.motivoAltoRisco,
+          exameRotina1Trimestre: gestanteAtual.exameRotina1Trimestre,
+          exameRotina2Trimestre: gestanteAtual.exameRotina2Trimestre,
+          exameRotina3Trimestre: gestanteAtual.exameRotina3Trimestre,
+          ultrassom1Trimestre: gestanteAtual.ultrassom1Trimestre,
+          ultrassom2Trimestre: gestanteAtual.ultrassom2Trimestre,
+          ultrassom3Trimestre: gestanteAtual.ultrassom3Trimestre,
+          vacinaHB: gestanteAtual.vacinaHB,
+          vacinaDT: gestanteAtual.vacinaDT,
+          vacinaInfluenza: gestanteAtual.vacinaInfluenza,
+          vacinaCovid19: gestanteAtual.vacinaCovid19,
+          vacinaDTPA20Semana: gestanteAtual.vacinaDTPA20Semana,
+          vacinaVSR28Semana: gestanteAtual.vacinaVSR28Semana,
+          enfermeiroId: session.user.id,
+          motivoExclusao: "manual",
+          createdAtOriginal: gestanteAtual.createdAt,
+          updatedAtOriginal: gestanteAtual.updatedAt,
+        },
+      })
+    } catch (auditError) {
+      console.error("Erro ao registrar exclusão na auditoria:", auditError)
+      // Se o modelo não existe, pode ser que o Prisma Client não foi regenerado
+      // ou o servidor precisa ser reiniciado
+      if (auditError instanceof Error && auditError.message.includes("undefined")) {
+        throw new Error("Prisma Client não atualizado. Execute 'npx prisma generate' e reinicie o servidor.")
+      }
+      // Continuar com a exclusão mesmo se falhar o registro de auditoria
+      // para não bloquear a funcionalidade
+    }
+
     await prisma.gestante.delete({
       where: { id },
     })

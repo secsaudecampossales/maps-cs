@@ -31,6 +31,7 @@ model Enfermeiro {
   ubs       UBS?     @relation(fields: [ubsId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  gestantesExcluidas GestanteExcluida[] // Relação com gestantes excluídas
 }
 
 model Gestante {
@@ -67,4 +68,47 @@ model Gestante {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model GestanteExcluida {
+  id                  String   @id @default(cuid())
+  // Dados da gestante excluída
+  nome                String
+  cartaoSus           String
+  ubsId               String
+  dum                 DateTime
+  dpp                 DateTime
+  etnia               String
+  gestacoesAnteriores Int
+  risco               String
+  descricaoRisco      String?
+  motivoAltoRisco     String?
+
+  // Exames de Rotina
+  exameRotina1Trimestre Boolean
+  exameRotina2Trimestre Boolean
+  exameRotina3Trimestre Boolean
+
+  // Ultrassonografia
+  ultrassom1Trimestre Boolean
+  ultrassom2Trimestre Boolean
+  ultrassom3Trimestre Boolean
+
+  // Vacinas
+  vacinaHB               Boolean
+  vacinaDT               Boolean
+  vacinaInfluenza        Boolean
+  vacinaCovid19          Boolean
+  vacinaDTPA20Semana     Boolean
+  vacinaVSR28Semana      Boolean
+
+  // Informações sobre a exclusão
+  enfermeiroId        String? // ID do enfermeiro que excluiu (null se foi exclusão automática)
+  enfermeiro          Enfermeiro? @relation(fields: [enfermeiroId], references: [id], onDelete: SetNull)
+  motivoExclusao      String   @default("manual") // "manual" ou "automatica"
+  dataExclusao        DateTime @default(now())
+
+  // Datas originais de criação e atualização
+  createdAtOriginal   DateTime
+  updatedAtOriginal   DateTime
 }
