@@ -165,7 +165,7 @@ export default function VisualizarGestantePage() {
       </Card>
       <Card className="border-none shadow-none">
         <CardHeader>
-          <CardTitle>Ressonância</CardTitle>
+          <CardTitle>Ultrassom</CardTitle>
           </CardHeader>
         <CardContent className="grid grid-cols-1 gap-4">
           <InfoItem label="Ultrassom 1º trimestre" value={yesNo(gestante.ultrassom1Trimestre)} />

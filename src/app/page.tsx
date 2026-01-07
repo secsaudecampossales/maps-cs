@@ -28,6 +28,7 @@ interface Gestante {
   etnia: string
   risco: string
   createdAt: string
+  ubsId: string
 }
 
 interface Stats {
@@ -520,6 +521,9 @@ export default function Dashboard() {
                     <th className="text-left p-4 font-semibold text-gray-700">DPP</th>
                     <th className="text-left p-4 font-semibold text-gray-700">Semanas de Gestação</th>
                     <th className="text-left p-4 font-semibold text-gray-700">Risco</th>
+                    {session?.user?.isAdmin && (
+                      <th className="text-left p-4 font-semibold text-gray-700">UBS</th>
+                    )}
                     <th className="text-left p-4 font-semibold text-gray-700">Ações</th>
                   </tr>
                 </thead>
@@ -539,6 +543,9 @@ export default function Dashboard() {
                           {gestante.risco}
                         </span>
                       </td>
+                      {session?.user?.isAdmin && (
+                        <td className="p-4 font-medium">{gestante.ubsId}</td>
+                      )}
                       <td className="p-4">
                         <div className="flex gap-2">
                           <Link href={`/gestantes/${gestante.id}/visualizar`}>
