@@ -48,11 +48,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-      <Card className="w-full max-w-md p-8">
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <Card className="w-full max-w-md p-8 shadow-lg">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">MAPS-CS</h1>
-          <p className="text-gray-600 dark:text-gray-400">Monitoramento da Atenção Primaria em Saúde - Campos Sales</p>
+          <h1 className="text-3xl font-bold text-blue-600 mb-2">MAPS-CS</h1>
+          <p className="text-muted-foreground">Monitoramento da Atenção Primaria em Saúde - Campos Sales</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -81,7 +81,7 @@ export default function LoginPage() {
           </div>
 
           {erro && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded">
+            <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded">
               {erro}
             </div>
           )}
