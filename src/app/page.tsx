@@ -138,11 +138,11 @@ export default function Dashboard() {
       case "Risco Baixo":
         return "bg-green-100 text-green-800 border-green-300"
       case "Risco Intermediário":
-        return "bg-yellow-100 text-yellow-800 border-yellow-300"
+        return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 border-yellow-300 dark:border-yellow-800"
       case "Risco Alto":
-        return "bg-red-100 text-red-800 border-red-300"
+        return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 border-red-300 dark:border-red-800"
       default:
-        return "bg-gray-100 text-gray-800 border-gray-300"
+        return "bg-gray-100 dark:bg-secondary text-gray-800 dark:text-foreground border-gray-300 dark:border-border"
     }
   }
 
@@ -249,17 +249,17 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       {showCleanupConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="w-full max-w-md rounded-lg bg-white shadow-lg border border-gray-200">
-            <div className="px-6 py-4 border-b">
-              <h2 className="text-lg font-semibold text-gray-900">Remover Ex-Gestantes</h2>
-              <p className="text-sm text-gray-600 mt-1">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-lg bg-white dark:bg-card shadow-lg border border-gray-200 dark:border-border">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-border">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-foreground">Remover Ex-Gestantes</h2>
+              <p className="text-sm text-gray-600 dark:text-muted-foreground mt-1">
                 Isso vai excluir automaticamente todas as gestantes cuja DPP já passou.
                 Esta ação não pode ser desfeita.
               </p>
             </div>
             <div className="px-6 py-4 flex flex-col gap-4">
-              <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-800">
+              <div className="rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-800 dark:text-red-400">
                 Confirme apenas se já registrou o desfecho dessas gestantes. A remoção é definitiva.
               </div>
               <div className="flex justify-end gap-3">
@@ -287,8 +287,8 @@ export default function Dashboard() {
       {/* Título e Botão de Adicionar */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-2">Monitoramento de Gestantes - APS Campos Sales</p>
+          <h1 className="text-3xl font-bold dark:text-gray-200">Dashboard</h1>
+          <p className="dark:text-gray-100 mt-2">Monitoramento de Gestantes - APS Campos Sales</p>
         </div>
         <div className="flex gap-2">
           {/* {session?.user?.isAdmin && (
@@ -356,10 +356,10 @@ export default function Dashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Partos Este Mês</CardTitle>
-            <Baby className="h-4 w-4 text-blue-600" />
+            <Baby className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-600">{stats.partosEsteMes}</div>
+            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.partosEsteMes}</div>
             <p className="text-xs text-muted-foreground mt-1">
               DPP previsto para este mês
             </p>
@@ -487,16 +487,16 @@ export default function Dashboard() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-center py-8 text-gray-500">Carregando...</div>
+            <div className="text-center py-8 text-gray-500 dark:text-muted-foreground">Carregando...</div>
           ) : gestantes.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-500 dark:text-muted-foreground">
               <p className="mb-4">Nenhuma gestante cadastrada ainda.</p>
               <Link href="/gestantes/novo">
                 <Button>Cadastrar Primeira Gestante</Button>
               </Link>
             </div>
           ) : filteredGestantes.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-500 dark:text-muted-foreground">
               <p className="mb-2">Nenhuma gestante encontrada com os filtros atuais.</p>
               <Button
                 type="button"
@@ -515,25 +515,25 @@ export default function Dashboard() {
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-4 font-semibold text-gray-700">Nome</th>
-                    <th className="text-left p-4 font-semibold text-gray-700">DUM</th>
-                    <th className="text-left p-4 font-semibold text-gray-700">DPP</th>
-                    <th className="text-left p-4 font-semibold text-gray-700">Semanas de Gestação</th>
-                    <th className="text-left p-4 font-semibold text-gray-700">Risco</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-foreground">Nome</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-foreground">DUM</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-foreground">DPP</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-foreground">Semanas de Gestação</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-foreground">Risco</th>
                     {session?.user?.isAdmin && (
-                      <th className="text-left p-4 font-semibold text-gray-700">UBS</th>
+                      <th className="text-left p-4 font-semibold text-gray-700 dark:text-foreground">UBS</th>
                     )}
-                    <th className="text-left p-4 font-semibold text-gray-700">Ações</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-foreground">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedGestantes.map((gestante) => (
-                    <tr key={gestante.id} className="border-b hover:bg-gray-50">
-                      <td className="p-4 font-medium">{gestante.nome}</td>
-                      <td className="p-4">{formatDate(gestante.dum)}</td>
-                      <td className="p-4">{formatDate(gestante.dpp)}</td>
-                      <td className="p-4">{calculateWeeks(gestante.dum)} semanas</td>
+                    <tr key={gestante.id} className="border-b border-border hover:bg-accent/50 dark:hover:bg-secondary/40 transition-colors">
+                      <td className="p-4 font-medium text-foreground">{gestante.nome}</td>
+                      <td className="p-4 text-foreground">{formatDate(gestante.dum)}</td>
+                      <td className="p-4 text-foreground">{formatDate(gestante.dpp)}</td>
+                      <td className="p-4 text-foreground">{calculateWeeks(gestante.dum)} semanas</td>
                       <td className="p-4">
                         <span
                           className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${getRiscoColor(
@@ -544,9 +544,9 @@ export default function Dashboard() {
                         </span>
                       </td>
                       {session?.user?.isAdmin && (
-                        <td className="p-4 font-medium">{gestante.ubsId}</td>
+                        <td className="p-4 font-medium text-foreground">{gestante.ubsId}</td>
                       )}
-                      <td className="p-4">
+                      <td className="p-4 text-foreground">
                         <div className="flex gap-2">
                           <Link href={`/gestantes/${gestante.id}/visualizar`}>
                             <Button variant="outline" size="sm" className="gap-2 bg-blue-500 text-white">

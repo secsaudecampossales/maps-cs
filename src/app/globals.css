@@ -23,6 +23,29 @@
     --ring: 0 0% 3.9%;
     --radius: 0.5rem;
   }
+
+  .dark {
+    /* Paleta estilo Google Material Design - tons de cinza suaves */
+    --background: 0 0% 12.5%; /* #202124 - fundo principal */
+    --foreground: 0 0% 91%; /* #e8eaed - texto principal */
+    --card: 0 0% 18.8%; /* #303134 - cards e superfícies */
+    --card-foreground: 0 0% 91%; /* #e8eaed - texto em cards */
+    --popover: 0 0% 18.8%; /* #303134 */
+    --popover-foreground: 0 0% 91%; /* #e8eaed */
+    --primary: 0 0% 91%; /* #e8eaed - elementos primários */
+    --primary-foreground: 0 0% 12.5%; /* #202124 */
+    --secondary: 0 0% 24.7%; /* #3c4043 - elementos secundários */
+    --secondary-foreground: 0 0% 91%; /* #e8eaed */
+    --muted: 0 0% 24.7%; /* #3c4043 - elementos muted */
+    --muted-foreground: 0 0% 60.4%; /* #9aa0a6 - texto secundário */
+    --accent: 0 0% 24.7%; /* #3c4043 - elementos de destaque */
+    --accent-foreground: 0 0% 91%; /* #e8eaed */
+    --destructive: 0 72% 51%; /* vermelho mais suave */
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 37.3%; /* #5f6368 - bordas */
+    --input: 0 0% 24.7%; /* #3c4043 - inputs */
+    --ring: 0 0% 60.4%; /* #9aa0a6 - anel de foco */
+  }
 }
 
 @theme inline {

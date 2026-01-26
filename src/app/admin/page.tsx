@@ -435,8 +435,8 @@ export default function AdminPage() {
     <div className="max-w-7xl mx-auto space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Área Administrativa</h1>
-          <p className="text-gray-600 mt-1">Relatórios customizados de gestantes</p>
+          <h1 className="text-3xl font-bold dark:text-gray-200">Área Administrativa</h1>
+          <p className=" dark:text-gray-100 mt-1">Relatórios customizados de gestantes</p>
         </div>
         <Link href="/">
           <Button variant="outline">Voltar ao Dashboard</Button>
