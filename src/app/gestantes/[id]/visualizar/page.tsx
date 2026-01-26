@@ -85,7 +85,7 @@ export default function VisualizarGestantePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <p className="text-gray-500">Carregando gestante...</p>
+        <p className="text-muted-foreground">Carregando gestante...</p>
       </div>
     )
   }
@@ -93,7 +93,7 @@ export default function VisualizarGestantePage() {
   if (error || !gestante) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-        <p className="text-gray-700">{error || "Gestante não encontrada"}</p>
+        <p className="text-foreground">{error || "Gestante não encontrada"}</p>
         <Link href="/">
           <Button variant="outline">Voltar ao dashboard</Button>
         </Link>
@@ -111,8 +111,8 @@ export default function VisualizarGestantePage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{gestante.nome}</h1>
-            <p className="text-gray-600">Informações completas do cadastro</p>
+            <h1 className="text-3xl font-bold text-foreground">{gestante.nome}</h1>
+            <p className="text-muted-foreground">Informações completas do cadastro</p>
           </div>
         </div>
         <Link href={`/gestantes/${id}`}>
@@ -195,9 +195,9 @@ export default function VisualizarGestantePage() {
 
 function InfoItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col rounded-lg border border-gray-200 p-3">
-      <span className="text-sm text-gray-600">{label}</span>
-      <span className="text-base font-semibold text-gray-900">{value}</span>
+    <div className="flex flex-col rounded-lg border border-border p-3">
+      <span className="text-sm text-muted-foreground">{label}</span>
+      <span className="text-base font-semibold text-foreground">{value}</span>
     </div>
   )
 }
