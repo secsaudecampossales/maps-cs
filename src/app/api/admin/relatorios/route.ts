@@ -187,9 +187,17 @@ export async function GET(request: NextRequest) {
     })
 
     // Filtrar por semanas de gestação (após buscar do banco, pois é calculado)
-    let gestantesFiltradas = gestantes
+    // Sempre filtrar gestantes com mais de 41 semanas (não devem aparecer no relatório)
+    let gestantesFiltradas = gestantes.filter((g) => {
+      const semanas = calcularSemanas(new Date(g.dum))
+      // Sempre excluir gestantes com mais de 41 semanas
+      if (semanas > 41) return false
+      return true
+    })
+
+    // Aplicar filtros adicionais de semanas se especificados
     if (semanasMin || semanasMax) {
-      gestantesFiltradas = gestantes.filter((g) => {
+      gestantesFiltradas = gestantesFiltradas.filter((g) => {
         const semanas = calcularSemanas(new Date(g.dum))
         if (semanasMin && semanas < parseInt(semanasMin)) return false
         if (semanasMax && semanas > parseInt(semanasMax)) return false
