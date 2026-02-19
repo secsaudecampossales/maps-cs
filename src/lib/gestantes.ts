@@ -24,6 +24,7 @@ export async function removeGestantesPosTresMeses() {
       data: gestantesParaExcluir.map((gestante) => ({
         nome: gestante.nome,
         cartaoSus: gestante.cartaoSus,
+        telefone: gestante.telefone,
         ubsId: gestante.ubsId,
         dum: gestante.dum,
         dpp: gestante.dpp,

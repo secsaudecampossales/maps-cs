@@ -88,6 +88,7 @@ export async function POST(request: NextRequest) {
     const {
       nome,
       cartaoSus,
+      telefone,
       ubsId,
       dum,
       etnia,
@@ -111,6 +112,25 @@ export async function POST(request: NextRequest) {
         }
       )
     }
+    
+    let telefoneValue: string | null = null
+    if (telefone !== undefined && telefone !== null) {
+      const digits = String(telefone).replace(/\D/g, "")
+      if (digits.length > 0) {
+        if (digits.length < 10 || digits.length > 11) {
+          return NextResponse.json(
+            { error: "Telefone inválido. Informe DDD + número com 10 ou 11 dígitos." },
+            {
+              status: 400,
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          )
+        }
+        telefoneValue = digits
+      }
+    }
 
     const ubsDestino = session.user.isAdmin ? ubsId : session.user.ubsId
 
@@ -133,6 +153,7 @@ export async function POST(request: NextRequest) {
       data: {
         nome,
         cartaoSus,
+        telefone: telefoneValue,
         ubsId: ubsDestino,
         dum: new Date(dum),
         dpp,

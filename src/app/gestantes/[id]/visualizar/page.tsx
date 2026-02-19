@@ -11,6 +11,7 @@ interface Gestante {
   id: string
   nome: string
   cartaoSus: string
+  telefone: string | null
   ubsId: string
   dum: string
   dpp: string
@@ -41,6 +42,14 @@ const formatCartaoSus = (value: string) => {
   if (digits.length > 7) parts.push(digits.slice(7, 11))
   if (digits.length > 11) parts.push(digits.slice(11, 15))
   return parts.join(" ")
+}
+
+const formatTelefone = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 11)
+  if (digits.length <= 2) return digits
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
+  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
 }
 
 const formatDate = (value: string) => new Date(value).toLocaleDateString("pt-BR")
@@ -131,6 +140,7 @@ export default function VisualizarGestantePage() {
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <InfoItem label="Nome" value={gestante.nome} />
           <InfoItem label="Cartão SUS" value={formatCartaoSus(gestante.cartaoSus || "")} />
+          <InfoItem label="Telefone" value={formatTelefone(gestante.telefone || "")} />
           <InfoItem label="DUM" value={formatDate(gestante.dum)} />
           <InfoItem label="DPP" value={formatDate(gestante.dpp)} />
           <InfoItem label="Semanas de Gestação" value={`${calculateWeeks(gestante.dum)} semanas`} />

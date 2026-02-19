@@ -30,6 +30,16 @@ const formatCartaoSus = (value: string) => {
 
 const sanitizeCartaoSus = (value: string) => value.replace(/\D/g, "").slice(0, 15)
 
+const formatTelefone = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 11)
+  if (digits.length <= 2) return digits
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
+  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
+}
+
+const sanitizeTelefone = (value: string) => value.replace(/\D/g, "").slice(0, 11)
+
 export default function NovaGestantePage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -37,6 +47,7 @@ export default function NovaGestantePage() {
   const [formData, setFormData] = useState({
     nome: "",
     cartaoSus: "",
+    telefone: "",
     ubsId: "",
     dum: "",
     dpp: "",
@@ -86,6 +97,13 @@ export default function NovaGestantePage() {
     })
   }
 
+  const handleTelefoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      telefone: formatTelefone(e.target.value),
+    })
+  }
+
   const handleDumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const dum = e.target.value
     if (dum) {
@@ -108,10 +126,16 @@ export default function NovaGestantePage() {
     e.preventDefault()
 
     const cartaoSus = sanitizeCartaoSus(formData.cartaoSus)
+    const telefone = sanitizeTelefone(formData.telefone)
 
     // Validações
     if (!formData.nome || !cartaoSus || !formData.ubsId || !formData.dum || !formData.etnia || !formData.risco) {
       alert("Por favor, preencha todos os campos obrigatórios.")
+      return
+    }
+
+    if (telefone && (telefone.length < 10 || telefone.length > 11)) {
+      alert("Telefone inválido. Informe DDD + número com 10 ou 11 dígitos.")
       return
     }
 
@@ -131,6 +155,7 @@ export default function NovaGestantePage() {
         body: JSON.stringify({
           ...formData,
           cartaoSus,
+          telefone,
         }),
       })
 
@@ -194,6 +219,21 @@ export default function NovaGestantePage() {
               />
               <p className="text-xs text-gray-500">
                 Número do cartão do SUS (obrigatório e único)
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="telefone">Telefone</Label>
+              <Input
+                id="telefone"
+                type="tel"
+                value={formData.telefone}
+                onChange={handleTelefoneChange}
+                placeholder="(99) 99999-9999"
+                maxLength={16}
+              />
+              <p className="text-xs text-gray-500">
+                Opcional. Informe o telefone com DDD (10 ou 11 dígitos) se disponível.
               </p>
             </div>
 

@@ -78,6 +78,7 @@ export async function PUT(
     const {
       nome,
       cartaoSus,
+      telefone,
       ubsId,
       dum,
       etnia,
@@ -107,11 +108,34 @@ export async function PUT(
       )
     }
 
+    let telefoneValue: string | null | undefined
+    if (telefone !== undefined) {
+      const digits = String(telefone).replace(/\D/g, "")
+      if (digits.length === 0) {
+        // usuário limpou o telefone -> gravar como null
+        telefoneValue = null
+      } else {
+        if (digits.length < 10 || digits.length > 11) {
+          return NextResponse.json(
+            { error: "Telefone inválido. Informe DDD + número com 10 ou 11 dígitos." },
+            {
+              status: 400,
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          )
+        }
+        telefoneValue = digits
+      }
+    }
+
     const gestante = await prisma.gestante.update({
       where: { id },
       data: {
         ...(nome && { nome }),
         ...(cartaoSus && { cartaoSus }),
+        ...(telefoneValue !== undefined && { telefone: telefoneValue }),
         ...(session.user.isAdmin && ubsId && { ubsId }),
         ...(dum && { dum: new Date(dum) }),
         ...(dpp && { dpp }),
@@ -191,6 +215,7 @@ export async function DELETE(
         data: {
           nome: gestanteAtual.nome,
           cartaoSus: gestanteAtual.cartaoSus,
+            telefone: gestanteAtual.telefone,
           ubsId: gestanteAtual.ubsId,
           dum: gestanteAtual.dum,
           dpp: gestanteAtual.dpp,

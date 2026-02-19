@@ -38,6 +38,7 @@ model Gestante {
   id                  String   @id @default(cuid())
   nome                String
   cartaoSus           String   @unique // Cartão do SUS (obrigatório e único)
+  telefone            String?  // Telefone de contato (DDD + número)
   ubsId               String // UBS à qual a gestante pertence
   ubs                 UBS      @relation(fields: [ubsId], references: [id], onDelete: Cascade)
   dum                 DateTime // Data da Última Menstruação
@@ -75,6 +76,7 @@ model GestanteExcluida {
   // Dados da gestante excluída
   nome                String
   cartaoSus           String
+  telefone            String?
   ubsId               String
   dum                 DateTime
   dpp                 DateTime
