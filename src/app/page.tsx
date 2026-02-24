@@ -285,10 +285,12 @@ export default function Dashboard() {
         </div>
       )}
       {/* Título e Botão de Adicionar */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold dark:text-gray-200">Dashboard</h1>
-          <p className="dark:text-gray-100 mt-2">Monitoramento de Gestantes - APS Campos Sales</p>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Visão geral</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Acompanhe rapidamente o risco, partos previstos e gestantes cadastradas na APS Campos Sales.
+          </p>
         </div>
         <div className="flex gap-2">
           {/* {session?.user?.isAdmin && (
@@ -313,66 +315,89 @@ export default function Dashboard() {
 
       {/* Cards de Estatísticas */}
       <div className="grid gap-4 md:grid-cols-5">
-        <Card>
+        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-blue-50 via-sky-50 to-blue-100 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 shadow-sm">
+          <div className="pointer-events-none absolute -right-6 -top-10 h-24 w-24 rounded-full bg-blue-500/15 blur-2xl" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Gestantes</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-blue-900 dark:text-blue-100">
+              Total de Gestantes
+            </CardTitle>
+            <Users className="h-4 w-4 text-blue-500 dark:text-blue-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{stats.totalGestantes}</div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <div className="text-3xl font-bold text-blue-700 dark:text-blue-300">{stats.totalGestantes}</div>
+            <p className="text-xs text-blue-900/70 dark:text-blue-100/80 mt-1">
               Gestantes cadastradas no sistema
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-red-50 via-rose-50 to-red-100 dark:from-red-950 dark:via-slate-950 dark:to-red-950 shadow-sm">
+          <div className="pointer-events-none absolute -right-6 -top-10 h-24 w-24 rounded-full bg-red-500/15 blur-2xl" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Gestantes de Alto Risco</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-600" />
+            <CardTitle className="text-sm font-medium text-red-900 dark:text-red-100">
+              Gestantes de Alto Risco
+            </CardTitle>
+            <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-red-600">{stats.gestantesAltoRisco}</div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <div className="text-3xl font-bold text-red-700 dark:text-red-300">
+              {stats.gestantesAltoRisco}
+            </div>
+            <p className="text-xs text-red-900/80 dark:text-red-100/80 mt-1">
               Requerem atenção especial
             </p>
           </CardContent>
         </Card>
-        <Card>
+
+        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100 dark:from-amber-950 dark:via-slate-950 dark:to-amber-950 shadow-sm">
+          <div className="pointer-events-none absolute -right-6 -top-10 h-24 w-24 rounded-full bg-amber-500/15 blur-2xl" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Risco Intermediário</CardTitle>
-            <AlertCircle className="h-4 w-4 text-yellow-600" />
+            <CardTitle className="text-sm font-medium text-amber-900 dark:text-amber-100">
+              Risco Intermediário
+            </CardTitle>
+            <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-yellow-600">
+            <div className="text-3xl font-bold text-amber-700 dark:text-amber-300">
               {stats.gestantesRiscoIntermediario}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-amber-900/80 dark:text-amber-100/80 mt-1">
               Monitoramento reforçado
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-sky-50 via-blue-50 to-sky-100 dark:from-sky-950 dark:via-slate-950 dark:to-sky-950 shadow-sm">
+          <div className="pointer-events-none absolute -right-6 -top-10 h-24 w-24 rounded-full bg-sky-500/15 blur-2xl" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Partos Este Mês</CardTitle>
+            <CardTitle className="text-sm font-medium text-sky-900 dark:text-sky-100">
+              Partos Este Mês
+            </CardTitle>
             <Baby className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.partosEsteMes}</div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <div className="text-3xl font-bold text-sky-700 dark:text-sky-300">
+              {stats.partosEsteMes}
+            </div>
+            <p className="text-xs text-sky-900/80 dark:text-sky-100/80 mt-1">
               DPP previsto para este mês
             </p>
           </CardContent>
         </Card>
-        <Card>
+
+        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-emerald-50 via-green-50 to-emerald-100 dark:from-emerald-950 dark:via-slate-950 dark:to-emerald-950 shadow-sm">
+          <div className="pointer-events-none absolute -right-6 -top-10 h-24 w-24 rounded-full bg-emerald-500/15 blur-2xl" />
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Partos nos últimos 3 meses</CardTitle>
-            <Check className="h-4 w-4 text-green-600" />
+            <CardTitle className="text-sm font-medium text-emerald-900 dark:text-emerald-100">
+              Partos nos últimos 3 meses
+            </CardTitle>
+            <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-600">{stats.partosDosUltimos3Meses}</div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <div className="text-3xl font-bold text-emerald-700 dark:text-emerald-300">
+              {stats.partosDosUltimos3Meses}
+            </div>
+            <p className="text-xs text-emerald-900/80 dark:text-emerald-100/80 mt-1">
               Partos concluídos nos últimos 3 meses
             </p>
           </CardContent>
@@ -380,7 +405,7 @@ export default function Dashboard() {
       </div>
 
       {/* Tabela de Gestantes */}
-      <Card>
+      <Card className="border-none bg-card/80 shadow-md shadow-black/5">
         <CardHeader>
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
@@ -487,16 +512,16 @@ export default function Dashboard() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-center py-8 text-gray-500 dark:text-muted-foreground">Carregando...</div>
+            <div className="text-center py-8 text-gray-500 dark:text-foreground/80">Carregando...</div>
           ) : gestantes.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 dark:text-muted-foreground">
+            <div className="text-center py-8 text-gray-500 dark:text-foreground/80">
               <p className="mb-4">Nenhuma gestante cadastrada ainda.</p>
               <Link href="/gestantes/novo">
                 <Button>Cadastrar Primeira Gestante</Button>
               </Link>
             </div>
           ) : filteredGestantes.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 dark:text-muted-foreground">
+            <div className="text-center py-8 text-gray-500 dark:text-foreground/80">
               <p className="mb-2">Nenhuma gestante encontrada com os filtros atuais.</p>
               <Button
                 type="button"
@@ -513,23 +538,27 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
+              <div className="min-w-full overflow-hidden rounded-xl border border-border bg-card/60 shadow-sm">
+              <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-foreground">Nome</th>
-                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-foreground">DUM</th>
-                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-foreground">DPP</th>
-                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-foreground">Semanas de Gestação</th>
-                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-foreground">Risco</th>
+                  <tr className="border-b border-border bg-muted/60 dark:bg-secondary/60">
+                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-muted-foreground dark:text-foreground/80">Nome</th>
+                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-muted-foreground dark:text-foreground/80">DUM</th>
+                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-muted-foreground dark:text-foreground/80">DPP</th>
+                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-muted-foreground dark:text-foreground/80">Semanas de Gestação</th>
+                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-muted-foreground dark:text-foreground/80">Risco</th>
                     {session?.user?.isAdmin && (
-                      <th className="text-left p-4 font-semibold text-gray-700 dark:text-foreground">UBS</th>
+                      <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-muted-foreground dark:text-foreground/80">UBS</th>
                     )}
-                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-foreground">Ações</th>
+                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-muted-foreground dark:text-foreground/80">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedGestantes.map((gestante) => (
-                    <tr key={gestante.id} className="border-b border-border hover:bg-accent/50 dark:hover:bg-secondary/40 transition-colors">
+                    <tr
+                      key={gestante.id}
+                      className="border-b border-border odd:bg-background even:bg-muted/40 dark:odd:bg-background dark:even:bg-secondary/40 hover:bg-accent/60 dark:hover:bg-secondary/60 transition-colors"
+                    >
                       <td className="p-4 font-medium text-foreground">{gestante.nome}</td>
                       <td className="p-4 text-foreground">{formatDate(gestante.dum)}</td>
                       <td className="p-4 text-foreground">{formatDate(gestante.dpp)}</td>
@@ -549,7 +578,7 @@ export default function Dashboard() {
                       <td className="p-4 text-foreground">
                         <div className="flex gap-2">
                           <Link href={`/gestantes/${gestante.id}/visualizar`}>
-                            <Button variant="outline" size="sm" className="gap-2 bg-blue-500 text-white">
+                            <Button variant="outline" size="sm" className="gap-2 bg-blue-500 text-white hover:bg-blue-600">
                               <Eye className="h-3 w-3" />
                               Ver
                             </Button>
@@ -576,6 +605,7 @@ export default function Dashboard() {
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
           )}
           {!loading && gestantes.length > 0 && (
