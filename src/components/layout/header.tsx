@@ -58,14 +58,24 @@ export function Header() {
                     </span>
                   </div>
                   {session.user?.isAdmin && (
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      asChild
-                      className="hidden sm:inline-flex bg-white/15 text-white border-white/20 hover:bg-white/25"
-                    >
-                      <a href="/admin">Área Admin</a>
-                    </Button>
+                    <div className="hidden sm:flex gap-2">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        asChild
+                        className="bg-white/15 text-white border-white/20 hover:bg-white/25"
+                      >
+                        <a href="/admin">Área Admin</a>
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        asChild
+                        className="bg-white/15 text-white border-white/20 hover:bg-white/25"
+                      >
+                        <a href="/admin/relatorios">Relatórios</a>
+                      </Button>
+                    </div>
                   )}
                   <Button
                     variant="outline"

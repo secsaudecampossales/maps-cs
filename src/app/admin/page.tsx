@@ -438,9 +438,14 @@ export default function AdminPage() {
           <h1 className="text-3xl font-bold dark:text-gray-200">Área Administrativa</h1>
           <p className=" dark:text-gray-100 mt-1">Relatórios customizados de gestantes</p>
         </div>
-        <Link href="/">
-          <Button variant="outline">Voltar ao Dashboard</Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/admin/relatorios">
+            <Button variant="outline">Relatório Mensal</Button>
+          </Link>
+          <Link href="/">
+            <Button variant="outline">Voltar ao Dashboard</Button>
+          </Link>
+        </div>
       </div>
 
       {/* Filtros */}
