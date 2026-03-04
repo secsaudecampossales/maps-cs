@@ -183,8 +183,8 @@ export default function NovaGestantePage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold dark:text-gray-200">Cadastrar Nova Gestante</h1>
-          <p className="dark:text-gray-200 mt-1">Preencha os dados da gestante</p>
+          <h1 className="text-3xl font-bold text-gray-900">Cadastrar Nova Gestante</h1>
+          <p className="text-gray-600 mt-1">Preencha os dados da gestante</p>
         </div>
       </div>
 

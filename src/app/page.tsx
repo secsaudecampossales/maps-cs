@@ -138,11 +138,11 @@ export default function Dashboard() {
       case "Risco Baixo":
         return "bg-green-100 text-green-800 border-green-300"
       case "Risco Intermediário":
-        return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 border-yellow-300 dark:border-yellow-800"
+        return "bg-yellow-100 text-yellow-800 border-yellow-300"
       case "Risco Alto":
-        return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 border-red-300 dark:border-red-800"
+        return "bg-red-100 text-red-800 border-red-300"
       default:
-        return "bg-gray-100 dark:bg-secondary text-gray-800 dark:text-foreground border-gray-300 dark:border-border"
+        return "bg-gray-100 text-gray-800 border-gray-300"
     }
   }
 
@@ -249,17 +249,17 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       {showCleanupConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-lg bg-white dark:bg-card shadow-lg border border-gray-200 dark:border-border">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-border">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-foreground">Remover Ex-Gestantes</h2>
-              <p className="text-sm text-gray-600 dark:text-muted-foreground mt-1">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+          <div className="w-full max-w-md rounded-lg bg-white shadow-lg border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">Remover Ex-Gestantes</h2>
+              <p className="text-sm text-gray-600 mt-1">
                 Isso vai excluir automaticamente todas as gestantes cuja DPP já passou.
                 Esta ação não pode ser desfeita.
               </p>
             </div>
             <div className="px-6 py-4 flex flex-col gap-4">
-              <div className="rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-800 dark:text-red-400">
+              <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-800">
                 Confirme apenas se já registrou o desfecho dessas gestantes. A remoção é definitiva.
               </div>
               <div className="flex justify-end gap-3">
@@ -287,8 +287,8 @@ export default function Dashboard() {
       {/* Título e Botão de Adicionar */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Visão geral</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Visão geral</h1>
+          <p className="mt-1 text-sm text-gray-600">
             Acompanhe rapidamente o risco, partos previstos e gestantes cadastradas na APS Campos Sales.
           </p>
         </div>
@@ -313,91 +313,86 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Cards de Estatísticas */}
+      {/* Cards de Estatísticas - cores sólidas para compatibilidade entre navegadores */}
       <div className="grid gap-4 md:grid-cols-5">
-        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-blue-50 via-sky-50 to-blue-100 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 shadow-sm">
-          <div className="pointer-events-none absolute -right-6 -top-10 h-24 w-24 rounded-full bg-blue-500/15 blur-2xl" />
+        <Card className="border-none bg-blue-50 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-900 dark:text-blue-100">
+            <CardTitle className="text-sm font-medium text-blue-900">
               Total de Gestantes
             </CardTitle>
-            <Users className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+            <Users className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-700 dark:text-blue-300">{stats.totalGestantes}</div>
-            <p className="text-xs text-blue-900/70 dark:text-blue-100/80 mt-1">
+            <div className="text-3xl font-bold text-blue-700">{stats.totalGestantes}</div>
+            <p className="text-xs text-blue-800 mt-1">
               Gestantes cadastradas no sistema
             </p>
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-red-50 via-rose-50 to-red-100 dark:from-red-950 dark:via-slate-950 dark:to-red-950 shadow-sm">
-          <div className="pointer-events-none absolute -right-6 -top-10 h-24 w-24 rounded-full bg-red-500/15 blur-2xl" />
+        <Card className="border-none bg-red-50 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-red-900 dark:text-red-100">
+            <CardTitle className="text-sm font-medium text-red-900">
               Gestantes de Alto Risco
             </CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+            <AlertTriangle className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-red-700 dark:text-red-300">
+            <div className="text-3xl font-bold text-red-700">
               {stats.gestantesAltoRisco}
             </div>
-            <p className="text-xs text-red-900/80 dark:text-red-100/80 mt-1">
+            <p className="text-xs text-red-800 mt-1">
               Requerem atenção especial
             </p>
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100 dark:from-amber-950 dark:via-slate-950 dark:to-amber-950 shadow-sm">
-          <div className="pointer-events-none absolute -right-6 -top-10 h-24 w-24 rounded-full bg-amber-500/15 blur-2xl" />
+        <Card className="border-none bg-amber-50 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-amber-900 dark:text-amber-100">
+            <CardTitle className="text-sm font-medium text-amber-900">
               Risco Intermediário
             </CardTitle>
-            <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+            <AlertCircle className="h-4 w-4 text-amber-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-amber-700 dark:text-amber-300">
+            <div className="text-3xl font-bold text-amber-800">
               {stats.gestantesRiscoIntermediario}
             </div>
-            <p className="text-xs text-amber-900/80 dark:text-amber-100/80 mt-1">
+            <p className="text-xs text-amber-800 mt-1">
               Monitoramento reforçado
             </p>
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-sky-50 via-blue-50 to-sky-100 dark:from-sky-950 dark:via-slate-950 dark:to-sky-950 shadow-sm">
-          <div className="pointer-events-none absolute -right-6 -top-10 h-24 w-24 rounded-full bg-sky-500/15 blur-2xl" />
+        <Card className="border-none bg-sky-50 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-sky-900 dark:text-sky-100">
+            <CardTitle className="text-sm font-medium text-sky-900">
               Partos Este Mês
             </CardTitle>
-            <Baby className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <Baby className="h-4 w-4 text-sky-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-sky-700 dark:text-sky-300">
+            <div className="text-3xl font-bold text-sky-700">
               {stats.partosEsteMes}
             </div>
-            <p className="text-xs text-sky-900/80 dark:text-sky-100/80 mt-1">
+            <p className="text-xs text-sky-800 mt-1">
               DPP previsto para este mês
             </p>
           </CardContent>
         </Card>
 
-        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-emerald-50 via-green-50 to-emerald-100 dark:from-emerald-950 dark:via-slate-950 dark:to-emerald-950 shadow-sm">
-          <div className="pointer-events-none absolute -right-6 -top-10 h-24 w-24 rounded-full bg-emerald-500/15 blur-2xl" />
+        <Card className="border-none bg-green-50 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-emerald-900 dark:text-emerald-100">
+            <CardTitle className="text-sm font-medium text-green-900">
               Partos nos últimos 3 meses
             </CardTitle>
-            <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
+            <Check className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-emerald-700 dark:text-emerald-300">
+            <div className="text-3xl font-bold text-green-700">
               {stats.partosDosUltimos3Meses}
             </div>
-            <p className="text-xs text-emerald-900/80 dark:text-emerald-100/80 mt-1">
+            <p className="text-xs text-green-800 mt-1">
               Partos concluídos nos últimos 3 meses
             </p>
           </CardContent>
@@ -405,12 +400,12 @@ export default function Dashboard() {
       </div>
 
       {/* Tabela de Gestantes */}
-      <Card className="border-none bg-card/80 shadow-md shadow-black/5">
+      <Card className="border border-gray-200 bg-white shadow-sm">
         <CardHeader>
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
-              <CardTitle>Lista de Gestantes</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-gray-900">Lista de Gestantes</CardTitle>
+              <CardDescription className="text-gray-600">
                 Visualize e gerencie todas as gestantes cadastradas
               </CardDescription>
             </div>
@@ -512,16 +507,16 @@ export default function Dashboard() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-center py-8 text-gray-500 dark:text-foreground/80">Carregando...</div>
+            <div className="text-center py-8 text-gray-500">Carregando...</div>
           ) : gestantes.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 dark:text-foreground/80">
+            <div className="text-center py-8 text-gray-500">
               <p className="mb-4">Nenhuma gestante cadastrada ainda.</p>
               <Link href="/gestantes/novo">
                 <Button>Cadastrar Primeira Gestante</Button>
               </Link>
             </div>
           ) : filteredGestantes.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 dark:text-foreground/80">
+            <div className="text-center py-8 text-gray-500">
               <p className="mb-2">Nenhuma gestante encontrada com os filtros atuais.</p>
               <Button
                 type="button"
@@ -541,28 +536,28 @@ export default function Dashboard() {
               <div className="min-w-full overflow-hidden rounded-xl border border-border bg-card/60 shadow-sm">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="border-b border-border bg-muted/60 dark:bg-secondary/60">
-                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-muted-foreground dark:text-foreground/80">Nome</th>
-                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-muted-foreground dark:text-foreground/80">DUM</th>
-                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-muted-foreground dark:text-foreground/80">DPP</th>
-                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-muted-foreground dark:text-foreground/80">Semanas de Gestação</th>
-                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-muted-foreground dark:text-foreground/80">Risco</th>
+                  <tr className="border-b border-border bg-gray-100">
+                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-gray-900">Nome</th>
+                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-gray-900">DUM</th>
+                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-gray-900">DPP</th>
+                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-gray-900">Semanas de Gestação</th>
+                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-gray-900">Risco</th>
                     {session?.user?.isAdmin && (
-                      <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-muted-foreground dark:text-foreground/80">UBS</th>
+                      <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-gray-900">UBS</th>
                     )}
-                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-muted-foreground dark:text-foreground/80">Ações</th>
+                    <th className="text-left p-4 text-xs font-semibold tracking-wide uppercase text-gray-900">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedGestantes.map((gestante) => (
                     <tr
                       key={gestante.id}
-                      className="border-b border-border odd:bg-background even:bg-muted/40 dark:odd:bg-background dark:even:bg-secondary/40 hover:bg-accent/60 dark:hover:bg-secondary/60 transition-colors"
+                      className="border-b border-border odd:bg-white even:bg-gray-50 hover:bg-gray-100 transition-colors"
                     >
-                      <td className="p-4 font-medium text-foreground">{gestante.nome}</td>
-                      <td className="p-4 text-foreground">{formatDate(gestante.dum)}</td>
-                      <td className="p-4 text-foreground">{formatDate(gestante.dpp)}</td>
-                      <td className="p-4 text-foreground">{calculateWeeks(gestante.dum)} semanas</td>
+                      <td className="p-4 font-medium text-gray-900">{gestante.nome}</td>
+                      <td className="p-4 text-gray-800">{formatDate(gestante.dum)}</td>
+                      <td className="p-4 text-gray-800">{formatDate(gestante.dpp)}</td>
+                      <td className="p-4 text-gray-800">{calculateWeeks(gestante.dum)} semanas</td>
                       <td className="p-4">
                         <span
                           className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${getRiscoColor(
@@ -573,9 +568,9 @@ export default function Dashboard() {
                         </span>
                       </td>
                       {session?.user?.isAdmin && (
-                        <td className="p-4 font-medium text-foreground">{gestante.ubsId}</td>
+                        <td className="p-4 font-medium text-gray-900">{gestante.ubsId}</td>
                       )}
-                      <td className="p-4 text-foreground">
+                      <td className="p-4 text-gray-800">
                         <div className="flex gap-2">
                           <Link href={`/gestantes/${gestante.id}/visualizar`}>
                             <Button variant="outline" size="sm" className="gap-2 bg-blue-500 text-white hover:bg-blue-600">
