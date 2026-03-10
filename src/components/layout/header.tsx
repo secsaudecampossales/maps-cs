@@ -8,10 +8,51 @@ import { useEffect, useState } from "react"
 export function Header() {
   const { data: session } = useSession()
   const [mounted, setMounted] = useState(false)
+  const INACTIVITY_LIMIT_SECONDS = 15 * 60
+  const [remainingSeconds, setRemainingSeconds] = useState(INACTIVITY_LIMIT_SECONDS)
 
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (!session) return
+
+    const events = ["click", "keydown", "mousemove", "scroll", "touchstart"]
+
+    const resetTimer = () => {
+      setRemainingSeconds(INACTIVITY_LIMIT_SECONDS)
+    }
+
+    const handleActivity = () => {
+      resetTimer()
+    }
+
+    events.forEach((eventName) => {
+      window.addEventListener(eventName, handleActivity)
+    })
+
+    const intervalId = window.setInterval(() => {
+      setRemainingSeconds((prev) => {
+        if (prev <= 1) {
+          signOut({ callbackUrl: "/login" })
+          return INACTIVITY_LIMIT_SECONDS
+        }
+
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => {
+      events.forEach((eventName) => {
+        window.removeEventListener(eventName, handleActivity)
+      })
+      window.clearInterval(intervalId)
+    }
+  }, [INACTIVITY_LIMIT_SECONDS, session])
+
+  const minutes = Math.floor(remainingSeconds / 60)
+  const seconds = remainingSeconds % 60
 
   return (
     <header className="w-full flex justify-center bg-gradient-to-r from-blue-700 via-sky-600 to-sky-700 shadow-md">
@@ -38,6 +79,15 @@ export function Header() {
                     </span>
                     <span className="text-sm font-medium text-white truncate max-w-[180px]">
                       {session.user?.name}
+                    </span>
+                  </div>
+                  <div className="hidden sm:flex flex-col items-end leading-tight">
+                    <span className="text-[10px] text-blue-100/80">
+                      Sessão será encerrada em
+                    </span>
+                    <span className="text-xs font-mono text-white">
+                      {minutes.toString().padStart(2, "0")}:
+                      {seconds.toString().padStart(2, "0")}
                     </span>
                   </div>
                   {session.user?.isAdmin && (
