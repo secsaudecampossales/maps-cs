@@ -18,7 +18,7 @@ export function Header() {
   useEffect(() => {
     if (!session) return
 
-    const events = ["click", "keydown", "mousemove", "scroll", "touchstart"]
+    const events = ["click"]
 
     const resetTimer = () => {
       setRemainingSeconds(INACTIVITY_LIMIT_SECONDS)
