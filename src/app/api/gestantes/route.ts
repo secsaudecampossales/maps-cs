@@ -25,7 +25,12 @@ export async function GET(request: NextRequest) {
       ? undefined
       : { ubsId: session.user.ubsId! }
 
-    await removeGestantesPosTresMeses()
+    try {
+      await removeGestantesPosTresMeses()
+    } catch (cleanupError) {
+      console.error("Falha ao executar limpeza automática de ex-gestantes:", cleanupError)
+      // Não bloqueia a listagem caso a limpeza falhe em produção.
+    }
     console.log("Iniciando busca de gestantes...")
     const gestantes = await prisma.gestante.findMany({
       where: whereClause,
