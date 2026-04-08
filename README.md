@@ -57,6 +57,30 @@ npm run dev
 
 Abra [http://localhost:3000](http://localhost:3000) no navegador.
 
+## 🗄️ Backup e Restore do Banco de Dados
+
+Os backups do banco (PostgreSQL) são gerados via `pg_dump` e ficam em `backups/` com checksum `SHA256`.
+
+Crie um backup:
+
+```bash
+npm run db:backup
+```
+
+Restaure (usa o dump mais recente):
+
+```bash
+npm run db:restore
+```
+
+Restaure especificando um arquivo:
+
+```bash
+npm run db:restore -- backups/backup_YYYYMMDD_HHMMSS.dump
+```
+
+Para restore em um alvo diferente, defina `RESTORE_TARGET_URL` no `.env`.
+
 ## 🔐 Sistema de Autenticação
 
 O sistema possui autenticação obrigatória. Apenas enfermeiros podem acessar o sistema.

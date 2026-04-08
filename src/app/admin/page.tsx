@@ -79,6 +79,8 @@ export default function AdminPage() {
     gestacoesMax: "",
     semanasMin: "",
     semanasMax: "",
+    idadeMin: "",
+    idadeMax: "",
     exameRotina1Trimestre: "",
     exameRotina2Trimestre: "",
     exameRotina3Trimestre: "",
@@ -138,6 +140,8 @@ export default function AdminPage() {
       if (filtros.gestacoesMax) params.append("gestacoesMax", filtros.gestacoesMax)
       if (filtros.semanasMin) params.append("semanasMin", filtros.semanasMin)
       if (filtros.semanasMax) params.append("semanasMax", filtros.semanasMax)
+      if (filtros.idadeMin) params.append("idadeMin", filtros.idadeMin)
+      if (filtros.idadeMax) params.append("idadeMax", filtros.idadeMax)
       if (filtros.exameRotina1Trimestre === "true") params.append("exameRotina1Trimestre", "true")
       if (filtros.exameRotina2Trimestre === "true") params.append("exameRotina2Trimestre", "true")
       if (filtros.exameRotina3Trimestre === "true") params.append("exameRotina3Trimestre", "true")
@@ -183,6 +187,8 @@ export default function AdminPage() {
       gestacoesMax: "",
       semanasMin: "",
       semanasMax: "",
+      idadeMin: "",
+      idadeMax: "",
       exameRotina1Trimestre: "",
       exameRotina2Trimestre: "",
       exameRotina3Trimestre: "",
@@ -207,6 +213,8 @@ export default function AdminPage() {
     const headers = [
       "Nome",
       "Cartão SUS",
+      "Data de Nascimento",
+      "Idade",
       "UBS",
       "Endereço UBS",
       "DUM",
@@ -235,6 +243,8 @@ export default function AdminPage() {
     const rows = relatorio.gestantes.map((g) => [
       g.nome,
       g.cartaoSus,
+      g.dataNascimento ? new Date(g.dataNascimento).toLocaleDateString("pt-BR") : "",
+      g.idade ?? "",
       g.nomeUBS || g.ubs?.nome || "",
       g.enderecoUBS || g.ubs?.endereco || "",
       new Date(g.dum).toLocaleDateString("pt-BR"),
@@ -321,6 +331,8 @@ export default function AdminPage() {
     const tableData = relatorio.gestantes.map((g) => [
       g.nome || "-",
       g.cartaoSus || "-",
+      g.dataNascimento ? new Date(g.dataNascimento).toLocaleDateString("pt-BR") : "-",
+      g.idade !== undefined && g.idade !== null ? `${g.idade}` : "-",
       (g.nomeUBS || g.ubs?.nome || "-").substring(0, 20),
       new Date(g.dum).toLocaleDateString("pt-BR"),
       new Date(g.dpp).toLocaleDateString("pt-BR"),
@@ -348,6 +360,8 @@ export default function AdminPage() {
         [
           "Nome",
           "Cartão SUS",
+          "Nascimento",
+          "Idade",
           "UBS",
           "DUM",
           "DPP",
@@ -397,6 +411,8 @@ export default function AdminPage() {
         18: { cellWidth: 15 },
         19: { cellWidth: 15 },
         20: { cellWidth: 15 },
+        21: { cellWidth: 15 },
+        22: { cellWidth: 15 },
       },
     })
 
@@ -624,6 +640,28 @@ export default function AdminPage() {
                     max="42"
                     value={filtros.semanasMax}
                     onChange={(e) => setFiltros({ ...filtros, semanasMax: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="idadeMin">Idade (Mín)</Label>
+                  <Input
+                    id="idadeMin"
+                    type="number"
+                    min="10"
+                    max="60"
+                    value={filtros.idadeMin}
+                    onChange={(e) => setFiltros({ ...filtros, idadeMin: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="idadeMax">Idade (Máx)</Label>
+                  <Input
+                    id="idadeMax"
+                    type="number"
+                    min="10"
+                    max="60"
+                    value={filtros.idadeMax}
+                    onChange={(e) => setFiltros({ ...filtros, idadeMax: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
@@ -1037,6 +1075,8 @@ export default function AdminPage() {
                     <tr className="border-b bg-gray-50">
                       <th className="text-left p-2 font-semibold text-sm sticky left-0 bg-gray-50 z-10">Nome</th>
                       <th className="text-left p-2 font-semibold text-sm">Cartão SUS</th>
+                      <th className="text-left p-2 font-semibold text-sm">Nascimento</th>
+                      <th className="text-left p-2 font-semibold text-sm">Idade</th>
                       <th className="text-left p-2 font-semibold text-sm">UBS</th>
                       <th className="text-left p-2 font-semibold text-sm">DUM</th>
                       <th className="text-left p-2 font-semibold text-sm">DPP</th>
@@ -1063,6 +1103,12 @@ export default function AdminPage() {
                       <tr key={gestante.id} className="border-b hover:bg-gray-50">
                         <td className="p-2 font-medium sticky left-0 bg-white z-10">{gestante.nome}</td>
                         <td className="p-2 text-sm">{gestante.cartaoSus}</td>
+                        <td className="p-2 text-sm">
+                          {gestante.dataNascimento
+                            ? new Date(gestante.dataNascimento).toLocaleDateString("pt-BR")
+                            : "-"}
+                        </td>
+                        <td className="p-2 text-sm">{gestante.idade ?? "-"}</td>
                         <td className="p-2 text-sm">{gestante.nomeUBS || gestante.ubs?.nome || "-"}</td>
                         <td className="p-2 text-sm">
                           {new Date(gestante.dum).toLocaleDateString("pt-BR")}

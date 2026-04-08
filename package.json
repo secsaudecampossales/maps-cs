@@ -7,6 +7,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
+    "db:backup": "bash scripts/backup_db.sh",
+    "db:restore": "bash scripts/restore_db.sh",
     "seed": "tsx prisma/seed.ts",
     "postinstall": "prisma generate"
   },
@@ -39,6 +41,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "baseline-browser-mapping": "^2.10.16",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
     "tailwindcss": "^4",

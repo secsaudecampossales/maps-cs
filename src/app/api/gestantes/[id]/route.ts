@@ -77,6 +77,7 @@ export async function PUT(
     const body = await request.json()
     const {
       nome,
+      dataNascimento,
       cartaoSus,
       telefone,
       ubsId,
@@ -134,6 +135,7 @@ export async function PUT(
       where: { id },
       data: {
         ...(nome && { nome }),
+        ...(dataNascimento && { dataNascimento: new Date(dataNascimento) }),
         ...(cartaoSus && { cartaoSus }),
         ...(telefoneValue !== undefined && { telefone: telefoneValue }),
         ...(session.user.isAdmin && ubsId && { ubsId }),
@@ -214,6 +216,7 @@ export async function DELETE(
       await prisma.gestanteExcluida.create({
         data: {
           nome: gestanteAtual.nome,
+          dataNascimento: gestanteAtual.dataNascimento,
           cartaoSus: gestanteAtual.cartaoSus,
             telefone: gestanteAtual.telefone,
           ubsId: gestanteAtual.ubsId,

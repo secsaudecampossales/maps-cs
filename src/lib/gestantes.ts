@@ -23,6 +23,7 @@ export async function removeGestantesPosTresMeses() {
     await prisma.gestanteExcluida.createMany({
       data: gestantesParaExcluir.map((gestante) => ({
         nome: gestante.nome,
+        dataNascimento: gestante.dataNascimento,
         cartaoSus: gestante.cartaoSus,
         telefone: gestante.telefone,
         ubsId: gestante.ubsId,

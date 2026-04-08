@@ -87,6 +87,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const {
       nome,
+      dataNascimento,
       cartaoSus,
       telefone,
       ubsId,
@@ -108,6 +109,18 @@ export async function POST(request: NextRequest) {
           status: 400,
           headers: {
             'Content-Type': 'application/json',
+          },
+        }
+      )
+    }
+
+    if (!dataNascimento) {
+      return NextResponse.json(
+        { error: "Data de nascimento é obrigatória" },
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
           },
         }
       )
@@ -152,6 +165,7 @@ export async function POST(request: NextRequest) {
     const gestante = await prisma.gestante.create({
       data: {
         nome,
+        dataNascimento: new Date(dataNascimento),
         cartaoSus,
         telefone: telefoneValue,
         ubsId: ubsDestino,

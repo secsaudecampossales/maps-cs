@@ -28,7 +28,6 @@ export default function LoginPage() {
       })
 
       if (result?.error) {
-        console.error("Erro no login:", result.error)
         setErro("Email ou senha incorretos")
         setCarregando(false)
       } else if (result?.ok) {

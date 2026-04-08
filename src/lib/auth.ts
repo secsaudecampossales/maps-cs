@@ -18,9 +18,15 @@ export const authOptions: NextAuthOptions = {
             return null
           }
 
-          const enfermeiro = await prisma.enfermeiro.findUnique({
+          const emailNormalizado = credentials.email.trim().toLowerCase()
+          const senhaInformada = credentials.senha.trim()
+
+          const enfermeiro = await prisma.enfermeiro.findFirst({
             where: {
-              email: credentials.email
+              email: {
+                equals: emailNormalizado,
+                mode: "insensitive",
+              },
             },
             select: {
               id: true,
@@ -33,14 +39,14 @@ export const authOptions: NextAuthOptions = {
           })
 
           if (!enfermeiro) {
-            console.error("Enfermeiro não encontrado:", credentials.email)
+            console.error("Enfermeiro não encontrado:", emailNormalizado)
             return null
           }
 
-          const senhaValida = await bcrypt.compare(credentials.senha, enfermeiro.senha)
+          const senhaValida = await bcrypt.compare(senhaInformada, enfermeiro.senha)
 
           if (!senhaValida) {
-            console.error("Senha inválida para:", credentials.email)
+            console.error("Senha inválida para:", emailNormalizado)
             return null
           }
 

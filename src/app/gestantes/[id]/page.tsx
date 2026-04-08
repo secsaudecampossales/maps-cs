@@ -15,6 +15,7 @@ import Link from "next/link"
 interface Gestante {
   id: string
   nome: string
+  dataNascimento: string | null
   cartaoSus: string
   telefone: string | null
   ubsId: string
@@ -76,6 +77,7 @@ export default function EditarGestantePage() {
   const [ubsList, setUbsList] = useState<UBS[]>([])
   const [formData, setFormData] = useState({
     nome: "",
+    dataNascimento: "",
     cartaoSus: "",
     telefone: "",
     ubsId: "",
@@ -130,6 +132,7 @@ export default function EditarGestantePage() {
         const gestante: Gestante = await response.json()
         setFormData({
           nome: gestante.nome,
+          dataNascimento: gestante.dataNascimento ? format(new Date(gestante.dataNascimento), "yyyy-MM-dd") : "",
           cartaoSus: formatCartaoSus(gestante.cartaoSus || ""),
           telefone: formatTelefone(gestante.telefone || ""),
           ubsId: gestante.ubsId || "",
@@ -207,7 +210,7 @@ export default function EditarGestantePage() {
     const cartaoSus = sanitizeCartaoSus(formData.cartaoSus)
     const telefone = sanitizeTelefone(formData.telefone)
 
-    if (!formData.nome || !cartaoSus || !formData.ubsId || !formData.dum || !formData.etnia || !formData.risco) {
+    if (!formData.nome || !formData.dataNascimento || !cartaoSus || !formData.ubsId || !formData.dum || !formData.etnia || !formData.risco) {
       alert("Por favor, preencha todos os campos obrigatórios.")
       return
     }
@@ -318,6 +321,17 @@ export default function EditarGestantePage() {
                 value={formData.nome}
                 onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                 placeholder="Digite o nome completo"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="dataNascimento">Data de Nascimento *</Label>
+              <Input
+                id="dataNascimento"
+                type="date"
+                value={formData.dataNascimento}
+                onChange={(e) => setFormData({ ...formData, dataNascimento: e.target.value })}
                 required
               />
             </div>

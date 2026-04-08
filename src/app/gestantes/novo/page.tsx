@@ -46,6 +46,7 @@ export default function NovaGestantePage() {
   const [ubsList, setUbsList] = useState<UBS[]>([])
   const [formData, setFormData] = useState({
     nome: "",
+    dataNascimento: "",
     cartaoSus: "",
     telefone: "",
     ubsId: "",
@@ -129,7 +130,7 @@ export default function NovaGestantePage() {
     const telefone = sanitizeTelefone(formData.telefone)
 
     // Validações
-    if (!formData.nome || !cartaoSus || !formData.ubsId || !formData.dum || !formData.etnia || !formData.risco) {
+    if (!formData.nome || !formData.dataNascimento || !cartaoSus || !formData.ubsId || !formData.dum || !formData.etnia || !formData.risco) {
       alert("Por favor, preencha todos os campos obrigatórios.")
       return
     }
@@ -203,6 +204,17 @@ export default function NovaGestantePage() {
                 value={formData.nome}
                 onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
                 placeholder="Digite o nome completo"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="dataNascimento">Data de Nascimento *</Label>
+              <Input
+                id="dataNascimento"
+                type="date"
+                value={formData.dataNascimento}
+                onChange={(e) => setFormData({ ...formData, dataNascimento: e.target.value })}
                 required
               />
             </div>

@@ -10,6 +10,7 @@ import { ArrowLeft, Edit } from "lucide-react"
 interface Gestante {
   id: string
   nome: string
+  dataNascimento: string | null
   cartaoSus: string
   telefone: string | null
   ubsId: string
@@ -140,6 +141,7 @@ export default function VisualizarGestantePage() {
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <InfoItem label="Nome" value={gestante.nome} />
           <InfoItem label="Cartão SUS" value={formatCartaoSus(gestante.cartaoSus || "")} />
+          <InfoItem label="Data de Nascimento" value={gestante.dataNascimento ? formatDate(gestante.dataNascimento) : "-"} />
           <InfoItem label="Telefone" value={formatTelefone(gestante.telefone || "")} />
           <InfoItem label="DUM" value={formatDate(gestante.dum)} />
           <InfoItem label="DPP" value={formatDate(gestante.dpp)} />

@@ -11,6 +11,16 @@ function calcularSemanas(dum: Date): number {
   return weeks >= 0 ? weeks : 0
 }
 
+function calcularIdade(dataNascimento: Date): number {
+  const hoje = new Date()
+  let idade = hoje.getFullYear() - dataNascimento.getFullYear()
+  const mesDiff = hoje.getMonth() - dataNascimento.getMonth()
+  if (mesDiff < 0 || (mesDiff === 0 && hoje.getDate() < dataNascimento.getDate())) {
+    idade--
+  }
+  return idade
+}
+
 // GET - Gerar relatórios customizados
 export async function GET(request: NextRequest) {
   const authError = await requireAdmin(request)
@@ -33,6 +43,8 @@ export async function GET(request: NextRequest) {
     const gestacoesMax = searchParams.get("gestacoesMax")
     const semanasMin = searchParams.get("semanasMin")
     const semanasMax = searchParams.get("semanasMax")
+    const idadeMin = searchParams.get("idadeMin")
+    const idadeMax = searchParams.get("idadeMax")
     const exameRotina1Trimestre = searchParams.get("exameRotina1Trimestre")
     const exameRotina2Trimestre = searchParams.get("exameRotina2Trimestre")
     const exameRotina3Trimestre = searchParams.get("exameRotina3Trimestre")
@@ -205,10 +217,21 @@ export async function GET(request: NextRequest) {
       })
     }
 
+    if (idadeMin || idadeMax) {
+      gestantesFiltradas = gestantesFiltradas.filter((g) => {
+        if (!g.dataNascimento) return false
+        const idade = calcularIdade(new Date(g.dataNascimento))
+        if (idadeMin && idade < parseInt(idadeMin)) return false
+        if (idadeMax && idade > parseInt(idadeMax)) return false
+        return true
+      })
+    }
+
     // Adicionar semanas de gestação calculadas e outras informações úteis
     const gestantesComInfo = gestantesFiltradas.map((g) => ({
       ...g,
       semanasGestacao: calcularSemanas(new Date(g.dum)),
+      idade: g.dataNascimento ? calcularIdade(new Date(g.dataNascimento)) : null,
       nomeUBS: g.ubs.nome,
       enderecoUBS: g.ubs.endereco,
     }))
@@ -269,6 +292,8 @@ export async function GET(request: NextRequest) {
           gestacoesMax: gestacoesMax || null,
           semanasMin: semanasMin || null,
           semanasMax: semanasMax || null,
+          idadeMin: idadeMin || null,
+          idadeMax: idadeMax || null,
           exameRotina1Trimestre: exameRotina1Trimestre || null,
           exameRotina2Trimestre: exameRotina2Trimestre || null,
           exameRotina3Trimestre: exameRotina3Trimestre || null,

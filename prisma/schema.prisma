@@ -37,6 +37,7 @@ model Enfermeiro {
 model Gestante {
   id                  String   @id @default(cuid())
   nome                String
+  dataNascimento      DateTime?
   cartaoSus           String   @unique // Cartão do SUS (obrigatório e único)
   telefone            String?  // Telefone de contato (DDD + número)
   ubsId               String // UBS à qual a gestante pertence
@@ -75,6 +76,7 @@ model GestanteExcluida {
   id                  String   @id @default(cuid())
   // Dados da gestante excluída
   nome                String
+  dataNascimento      DateTime?
   cartaoSus           String
   telefone            String?
   ubsId               String
