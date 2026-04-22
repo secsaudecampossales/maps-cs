@@ -82,6 +82,7 @@ export async function PUT(
       telefone,
       ubsId,
       dum,
+      semanasInicioPreNatal,
       etnia,
       gestacoesAnteriores,
       risco,
@@ -131,6 +132,23 @@ export async function PUT(
       }
     }
 
+    let semanasInicioPreNatalValue: number | undefined
+    if (semanasInicioPreNatal !== undefined) {
+      const parsedSemanasInicioPreNatal = Number(semanasInicioPreNatal)
+      if (!Number.isInteger(parsedSemanasInicioPreNatal) || parsedSemanasInicioPreNatal < 1 || parsedSemanasInicioPreNatal > 45) {
+        return NextResponse.json(
+          { error: "Semanas de início do pré-natal inválida. Informe um valor entre 1 e 45." },
+          {
+            status: 400,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+      }
+      semanasInicioPreNatalValue = parsedSemanasInicioPreNatal
+    }
+
     const gestante = await prisma.gestante.update({
       where: { id },
       data: {
@@ -141,6 +159,7 @@ export async function PUT(
         ...(session.user.isAdmin && ubsId && { ubsId }),
         ...(dum && { dum: new Date(dum) }),
         ...(dpp && { dpp }),
+        ...(semanasInicioPreNatalValue !== undefined && { semanasInicioPreNatal: semanasInicioPreNatalValue }),
         ...(etnia && { etnia }),
         ...(gestacoesAnteriores !== undefined && { gestacoesAnteriores: parseInt(gestacoesAnteriores) }),
         ...(risco && { risco }),
@@ -222,6 +241,7 @@ export async function DELETE(
           ubsId: gestanteAtual.ubsId,
           dum: gestanteAtual.dum,
           dpp: gestanteAtual.dpp,
+          semanasInicioPreNatal: gestanteAtual.semanasInicioPreNatal,
           etnia: gestanteAtual.etnia,
           gestacoesAnteriores: gestanteAtual.gestacoesAnteriores,
           risco: gestanteAtual.risco,

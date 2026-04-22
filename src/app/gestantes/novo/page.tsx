@@ -52,6 +52,7 @@ export default function NovaGestantePage() {
     ubsId: "",
     dum: "",
     dpp: "",
+    semanasInicioPreNatal: "",
     etnia: "",
     gestacoesAnteriores: "0",
     risco: "",
@@ -130,8 +131,14 @@ export default function NovaGestantePage() {
     const telefone = sanitizeTelefone(formData.telefone)
 
     // Validações
-    if (!formData.nome || !formData.dataNascimento || !cartaoSus || !formData.ubsId || !formData.dum || !formData.etnia || !formData.risco) {
+    if (!formData.nome || !formData.dataNascimento || !cartaoSus || !formData.ubsId || !formData.dum || !formData.semanasInicioPreNatal || !formData.etnia || !formData.risco) {
       alert("Por favor, preencha todos os campos obrigatórios.")
+      return
+    }
+
+    const semanasInicioPreNatalNumero = Number(formData.semanasInicioPreNatal)
+    if (!Number.isInteger(semanasInicioPreNatalNumero) || semanasInicioPreNatalNumero < 1 || semanasInicioPreNatalNumero > 45) {
+      alert("Semanas de início do pré-natal inválida. Informe um valor entre 1 e 45.")
       return
     }
 
@@ -294,6 +301,25 @@ export default function NovaGestantePage() {
                   Calculado automaticamente (DUM + 280 dias)
                 </p>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="semanasInicioPreNatal">Semanas no início do pré-natal *</Label>
+              <Input
+                id="semanasInicioPreNatal"
+                type="number"
+                min="1"
+                max="45"
+                value={formData.semanasInicioPreNatal}
+                onChange={(e) =>
+                  setFormData({ ...formData, semanasInicioPreNatal: e.target.value })
+                }
+                placeholder="Ex: 12"
+                required
+              />
+              <p className="text-xs text-gray-500">
+                Informe com quantas semanas gestacionais iniciou o acompanhamento pré-natal.
+              </p>
             </div>
           </CardContent>
         </Card>

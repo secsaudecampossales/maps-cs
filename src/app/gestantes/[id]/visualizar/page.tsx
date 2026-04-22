@@ -16,6 +16,7 @@ interface Gestante {
   ubsId: string
   dum: string
   dpp: string
+  semanasInicioPreNatal: number
   etnia: string
   gestacoesAnteriores: number
   risco: string
@@ -145,6 +146,7 @@ export default function VisualizarGestantePage() {
           <InfoItem label="Telefone" value={formatTelefone(gestante.telefone || "")} />
           <InfoItem label="DUM" value={formatDate(gestante.dum)} />
           <InfoItem label="DPP" value={formatDate(gestante.dpp)} />
+          <InfoItem label="Início do Pré-natal" value={`${gestante.semanasInicioPreNatal} semanas`} />
           <InfoItem label="Semanas de Gestação" value={`${calculateWeeks(gestante.dum)} semanas`} />
           <InfoItem label="UBS" value={gestante.ubsId} />
           <InfoItem label="Etnia" value={gestante.etnia} />

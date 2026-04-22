@@ -97,6 +97,7 @@ export async function POST(request: NextRequest) {
       telefone,
       ubsId,
       dum,
+      semanasInicioPreNatal,
       etnia,
       gestacoesAnteriores,
       risco,
@@ -122,6 +123,19 @@ export async function POST(request: NextRequest) {
     if (!dataNascimento) {
       return NextResponse.json(
         { error: "Data de nascimento é obrigatória" },
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+    }
+
+    const semanasInicioPreNatalNumero = Number(semanasInicioPreNatal)
+    if (!Number.isInteger(semanasInicioPreNatalNumero) || semanasInicioPreNatalNumero < 1 || semanasInicioPreNatalNumero > 45) {
+      return NextResponse.json(
+        { error: "Semanas de início do pré-natal inválida. Informe um valor entre 1 e 45." },
         {
           status: 400,
           headers: {
@@ -176,6 +190,7 @@ export async function POST(request: NextRequest) {
         ubsId: ubsDestino,
         dum: new Date(dum),
         dpp,
+        semanasInicioPreNatal: semanasInicioPreNatalNumero,
         etnia,
         gestacoesAnteriores: parseInt(gestacoesAnteriores) || 0,
         risco,

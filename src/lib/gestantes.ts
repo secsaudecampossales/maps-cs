@@ -29,6 +29,7 @@ export async function removeGestantesPosTresMeses() {
         ubsId: gestante.ubsId,
         dum: gestante.dum,
         dpp: gestante.dpp,
+        semanasInicioPreNatal: gestante.semanasInicioPreNatal,
         etnia: gestante.etnia,
         gestacoesAnteriores: gestante.gestacoesAnteriores,
         risco: gestante.risco,

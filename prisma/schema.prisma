@@ -44,6 +44,7 @@ model Gestante {
   ubs                 UBS      @relation(fields: [ubsId], references: [id], onDelete: Cascade)
   dum                 DateTime // Data da Última Menstruação
   dpp                 DateTime // Data Provável do Parto (calculada)
+  semanasInicioPreNatal Int    // Idade gestacional (em semanas) no início do pré-natal
   etnia               String // Branco, Preto, Pardo, Indígena, Amarelo
   gestacoesAnteriores Int      @default(0)
   risco               String // Risco Baixo, Risco Intermediário, Risco Alto
@@ -82,6 +83,7 @@ model GestanteExcluida {
   ubsId               String
   dum                 DateTime
   dpp                 DateTime
+  semanasInicioPreNatal Int
   etnia               String
   gestacoesAnteriores Int
   risco               String
