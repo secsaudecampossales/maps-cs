@@ -31,7 +31,6 @@ export async function GET(request: NextRequest) {
       console.error("Falha ao executar limpeza automática de ex-gestantes:", cleanupError)
       // Não bloqueia a listagem caso a limpeza falhe em produção.
     }
-    console.log("Iniciando busca de gestantes...")
     const gestantes = await prisma.gestante.findMany({
       where: whereClause,
       include: {
@@ -47,7 +46,6 @@ export async function GET(request: NextRequest) {
         createdAt: "desc",
       },
     })
-    console.log(`Encontradas ${gestantes.length} gestantes`)
     return NextResponse.json(gestantes, {
       headers: {
         'Content-Type': 'application/json',

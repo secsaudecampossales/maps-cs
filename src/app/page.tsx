@@ -6,6 +6,17 @@ import { useSession } from "next-auth/react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { AlertBanner } from "@/components/ui/alert-banner"
+import { Pagination } from "@/components/ui/pagination"
+import { DashboardSkeleton } from "@/components/ui/loading-skeleton"
+import {
+  calculateWeeks,
+  formatDate,
+  getRiscoColor,
+  isPartoEsteMes,
+  isPartoUltimos3Meses,
+} from "@/lib/formatters"
+import type { DashboardStats, GestanteListItem } from "@/types/gestante"
 import {
   Plus,
   Edit,
@@ -17,37 +28,18 @@ import {
   Eye,
   Check,
   Filter,
+  RefreshCw,
 } from "lucide-react"
-
-interface Gestante {
-  id: string
-  nome: string
-  cartaoSus?: string
-  dum: string
-  dpp: string
-  etnia: string
-  risco: string
-  createdAt: string
-  ubsId: string
-}
-
-interface Stats {
-  totalGestantes: number
-  gestantesAltoRisco: number
-  gestantesRiscoIntermediario: number
-  partosEsteMes: number
-  partosDosUltimos3Meses: number
-}
 
 export default function Dashboard() {
   const { data: session } = useSession()
-  const [gestantes, setGestantes] = useState<Gestante[]>([])
+  const [gestantes, setGestantes] = useState<GestanteListItem[]>([])
   const [page, setPage] = useState(1)
-   const [searchTerm, setSearchTerm] = useState("")
-   const [showFilters, setShowFilters] = useState(false)
-   const [riskFilter, setRiskFilter] = useState<"all" | "alto" | "intermediario">("all")
-   const [partoFilter, setPartoFilter] = useState<"all" | "ultimos3Meses" | "estemes">("all")
-  const [stats, setStats] = useState<Stats>({
+  const [searchTerm, setSearchTerm] = useState("")
+  const [showFilters, setShowFilters] = useState(false)
+  const [riskFilter, setRiskFilter] = useState<"all" | "alto" | "intermediario">("all")
+  const [partoFilter, setPartoFilter] = useState<"all" | "ultimos3Meses" | "estemes">("all")
+  const [stats, setStats] = useState<DashboardStats>({
     totalGestantes: 0,
     gestantesAltoRisco: 0,
     gestantesRiscoIntermediario: 0,
@@ -55,6 +47,7 @@ export default function Dashboard() {
     partosDosUltimos3Meses: 0,
   })
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [cleaning, setCleaning] = useState(false)
   const [showCleanupConfirm, setShowCleanupConfirm] = useState(false)
@@ -64,6 +57,7 @@ export default function Dashboard() {
   }, [])
 
   const fetchData = async () => {
+    setError(null)
     try {
       const [gestantesRes, statsRes] = await Promise.all([
         fetch("/api/gestantes"),
@@ -119,7 +113,11 @@ export default function Dashboard() {
       setStats(statsData)
     } catch (error) {
       console.error("Erro ao carregar dados:", error)
-      // Definir valores padrão em caso de erro
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível carregar os dados. Verifique sua conexão e tente novamente."
+      )
       setGestantes([])
       setStats({
         totalGestantes: 0,
@@ -131,47 +129,6 @@ export default function Dashboard() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const getRiscoColor = (risco: string) => {
-    switch (risco) {
-      case "Risco Baixo":
-        return "bg-green-100 text-green-800 border-green-300"
-      case "Risco Intermediário":
-        return "bg-yellow-100 text-yellow-800 border-yellow-300"
-      case "Risco Alto":
-        return "bg-red-100 text-red-800 border-red-300"
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-300"
-    }
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("pt-BR")
-  }
-
-  const calculateWeeks = (dum: string) => {
-    const dumDate = new Date(dum)
-    const today = new Date()
-    const diffTime = today.getTime() - dumDate.getTime()
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-    const weeks = Math.floor(diffDays / 7)
-    return weeks >= 0 ? weeks : 0
-  }
-
-  const isPartoUltimos3Meses = (dpp: string) => {
-    const dppDate = new Date(dpp)
-    const today = new Date()
-    const threeMonthsAgo = new Date()
-    threeMonthsAgo.setMonth(today.getMonth() - 3)
-
-    return dppDate >= threeMonthsAgo && dppDate <= today
-  }
-
-  const isPartoEsteMes = (dpp: string) => {
-    const dppDate = new Date(dpp)
-    const today = new Date()
-    return dppDate.getMonth() === today.getMonth() && dppDate.getFullYear() === today.getFullYear()
   }
 
   const filteredGestantes = gestantes.filter((gestante) => {
@@ -246,8 +203,19 @@ export default function Dashboard() {
     }
   }
 
+  if (loading) {
+    return <DashboardSkeleton />
+  }
+
   return (
     <div className="space-y-8">
+      {error && (
+        <AlertBanner
+          message={error}
+          action={{ label: "Tentar novamente", onClick: () => { setLoading(true); fetchData() } }}
+          onDismiss={() => setError(null)}
+        />
+      )}
       {showCleanupConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
           <div className="w-full max-w-md rounded-lg bg-white shadow-lg border border-gray-200">
@@ -293,17 +261,14 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="flex gap-2">
-          {/* {session?.user?.isAdmin && (
-            // <Button
-            //   variant="destructive"
-            //   className="gap-2"
-            //   onClick={() => setShowCleanupConfirm(true)}
-            //   disabled={cleaning}
-            // >
-            //   <Trash2 className="h-4 w-4" />
-            //   {cleaning ? "Removendo..." : "Remover Ex-Gestantes"}
-            // </Button>
-          )} */}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => { setLoading(true); fetchData() }}
+            aria-label="Atualizar dados"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
           <Link href="/gestantes/novo">
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
@@ -506,9 +471,7 @@ export default function Dashboard() {
           )}
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="text-center py-8 text-gray-500">Carregando...</div>
-          ) : gestantes.length === 0 ? (
+          {gestantes.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <p className="mb-4">Nenhuma gestante cadastrada ainda.</p>
               <Link href="/gestantes/novo">
@@ -568,7 +531,9 @@ export default function Dashboard() {
                         </span>
                       </td>
                       {session?.user?.isAdmin && (
-                        <td className="p-4 font-medium text-gray-900">{gestante.ubsId}</td>
+                        <td className="p-4 font-medium text-gray-900">
+                          {gestante.ubs?.nome ?? "—"}
+                        </td>
                       )}
                       <td className="p-4 text-gray-800">
                         <div className="flex gap-2">
@@ -603,34 +568,16 @@ export default function Dashboard() {
               </div>
             </div>
           )}
-          {!loading && gestantes.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 mt-4 justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-              >
-                Anterior
-              </Button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => (
-                <Button
-                  key={pageNumber}
-                  variant={pageNumber === currentPage ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setPage(pageNumber)}
-                >
-                  {pageNumber}
-                </Button>
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-              >
-                Próxima
-              </Button>
+          {gestantes.length > 0 && filteredGestantes.length > 0 && (
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-muted-foreground">
+                {filteredGestantes.length} gestante{filteredGestantes.length !== 1 ? "s" : ""} encontrada{filteredGestantes.length !== 1 ? "s" : ""}
+              </p>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
             </div>
           )}
         </CardContent>

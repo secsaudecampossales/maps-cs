@@ -2,14 +2,13 @@
 
 import { useState } from "react"
 import { signIn } from "next-auth/react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
+import { Activity } from "lucide-react"
 
 export default function LoginPage() {
-  const router = useRouter()
   const [email, setEmail] = useState("")
   const [senha, setSenha] = useState("")
   const [erro, setErro] = useState("")
@@ -31,30 +30,33 @@ export default function LoginPage() {
         setErro("Email ou senha incorretos")
         setCarregando(false)
       } else if (result?.ok) {
-        // Aguardar um pouco para garantir que a sessão foi criada
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise((resolve) => setTimeout(resolve, 100))
         window.location.href = "/"
       } else {
-        console.error("Resultado inesperado:", result)
         setErro("Erro ao fazer login. Tente novamente.")
         setCarregando(false)
       }
-    } catch (error) {
-      console.error("Erro ao fazer login:", error)
+    } catch {
       setErro("Erro ao fazer login. Tente novamente.")
       setCarregando(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <Card className="w-full max-w-md p-8 shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-sky-50 to-white p-4">
+      <Card className="w-full max-w-md p-8 shadow-xl border-blue-100">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-600 mb-2">MAPS-CS</h1>
-          <p className="text-muted-foreground">Monitoramento da Atenção Primaria em Saúde - Campos Sales</p>
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-sky-500 shadow-md">
+            <Activity className="h-7 w-7 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold text-blue-700">BRAÇOS ABERTOS</h1>
+          <p className="text-sm text-muted-foreground mt-1">MAPS-CS</p>
+          <p className="text-xs text-muted-foreground mt-2">
+            Monitoramento da Atenção Primária em Saúde — Campos Sales
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -63,6 +65,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email"
               placeholder="seu.email@exemplo.com"
             />
           </div>
@@ -75,21 +78,21 @@ export default function LoginPage() {
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               required
+              autoComplete="current-password"
               placeholder="••••••••"
             />
           </div>
 
           {erro && (
-            <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded">
+            <div
+              role="alert"
+              className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg text-sm"
+            >
               {erro}
             </div>
           )}
 
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={carregando}
-          >
+          <Button type="submit" className="w-full" disabled={carregando}>
             {carregando ? "Entrando..." : "Entrar"}
           </Button>
         </form>
@@ -97,4 +100,3 @@ export default function LoginPage() {
     </div>
   )
 }
-

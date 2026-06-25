@@ -19,6 +19,11 @@ export async function GET(
     const { id } = await params
     const gestante = await prisma.gestante.findUnique({
       where: { id },
+      include: {
+        ubs: {
+          select: { id: true, nome: true, endereco: true },
+        },
+      },
     })
 
     if (!gestante) {

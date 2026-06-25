@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
+import { useSession } from "next-auth/react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,67 +12,19 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { addDays, format } from "date-fns"
 import { ArrowLeft, Save, Trash2 } from "lucide-react"
 import Link from "next/link"
-
-interface Gestante {
-  id: string
-  nome: string
-  dataNascimento: string | null
-  cartaoSus: string
-  telefone: string | null
-  ubsId: string
-  dum: string
-  dpp: string
-  semanasInicioPreNatal: number
-  etnia: string
-  gestacoesAnteriores: number
-  risco: string
-  descricaoRisco: string | null
-  motivoAltoRisco: string | null
-  exameRotina1Trimestre: boolean
-  exameRotina2Trimestre: boolean
-  exameRotina3Trimestre: boolean
-  ultrassom1Trimestre: boolean
-  ultrassom2Trimestre: boolean
-  ultrassom3Trimestre: boolean
-  vacinaHB: boolean
-  vacinaDT: boolean
-  vacinaInfluenza: boolean
-  vacinaCovid19: boolean
-  vacinaDTPA20Semana: boolean
-  vacinaVSR28Semana: boolean
-}
-
-interface UBS {
-  id: string
-  nome: string
-  endereco: string
-}
-
-const formatCartaoSus = (value: string) => {
-  const digits = value.replace(/\D/g, "").slice(0, 15)
-  const parts = []
-  if (digits.length > 0) parts.push(digits.slice(0, 3))
-  if (digits.length > 3) parts.push(digits.slice(3, 7))
-  if (digits.length > 7) parts.push(digits.slice(7, 11))
-  if (digits.length > 11) parts.push(digits.slice(11, 15))
-  return parts.join(" ")
-}
-
-const sanitizeCartaoSus = (value: string) => value.replace(/\D/g, "").slice(0, 15)
-
-const formatTelefone = (value: string) => {
-  const digits = value.replace(/\D/g, "").slice(0, 11)
-  if (digits.length <= 2) return digits
-  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
-  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
-  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
-}
-
-const sanitizeTelefone = (value: string) => value.replace(/\D/g, "").slice(0, 11)
+import {
+  formatCartaoSus,
+  formatTelefone,
+  sanitizeCartaoSus,
+  sanitizeTelefone,
+} from "@/lib/formatters"
+import type { GestanteDetail, UBS } from "@/types/gestante"
 
 export default function EditarGestantePage() {
   const router = useRouter()
   const params = useParams()
+  const { data: session } = useSession()
+  const isAdmin = session?.user?.isAdmin ?? false
   const id = params.id as string
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -131,7 +84,7 @@ export default function EditarGestantePage() {
     try {
       const response = await fetch(`/api/gestantes/${id}`)
       if (response.ok) {
-        const gestante: Gestante = await response.json()
+        const gestante: GestanteDetail = await response.json()
         setFormData({
           nome: gestante.nome,
           dataNascimento: gestante.dataNascimento ? format(new Date(gestante.dataNascimento), "yyyy-MM-dd") : "",
@@ -213,8 +166,13 @@ export default function EditarGestantePage() {
     const cartaoSus = sanitizeCartaoSus(formData.cartaoSus)
     const telefone = sanitizeTelefone(formData.telefone)
 
-    if (!formData.nome || !formData.dataNascimento || !cartaoSus || !formData.ubsId || !formData.dum || !formData.semanasInicioPreNatal || !formData.etnia || !formData.risco) {
+    if (!formData.nome || !formData.dataNascimento || !cartaoSus || !formData.dum || !formData.semanasInicioPreNatal || !formData.etnia || !formData.risco) {
       alert("Por favor, preencha todos os campos obrigatórios.")
+      return
+    }
+
+    if (isAdmin && !formData.ubsId) {
+      alert("Por favor, selecione a UBS.")
       return
     }
 
@@ -377,22 +335,31 @@ export default function EditarGestantePage() {
 
             <div className="space-y-2">
               <Label htmlFor="ubsId">UBS *</Label>
-              <Select
-                value={formData.ubsId || undefined}
-                onValueChange={(value) => setFormData({ ...formData, ubsId: value })}
-                required
-              >
-                <SelectTrigger id="ubsId">
-                  <SelectValue placeholder="Selecione a UBS" />
-                </SelectTrigger>
-              <SelectContent className="max-h-64 overflow-y-auto">
-                  {ubsList.map((ubs) => (
-                    <SelectItem key={ubs.id} value={ubs.id}>
-                      {ubs.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {isAdmin ? (
+                <Select
+                  value={formData.ubsId || undefined}
+                  onValueChange={(value) => setFormData({ ...formData, ubsId: value })}
+                  required
+                >
+                  <SelectTrigger id="ubsId">
+                    <SelectValue placeholder="Selecione a UBS" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-64 overflow-y-auto">
+                    {ubsList.map((ubs) => (
+                      <SelectItem key={ubs.id} value={ubs.id}>
+                        {ubs.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  id="ubsId"
+                  value={ubsList.find((u) => u.id === formData.ubsId)?.nome ?? "—"}
+                  disabled
+                  className="bg-gray-50"
+                />
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

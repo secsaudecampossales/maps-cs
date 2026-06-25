@@ -6,71 +6,20 @@ import { useParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Edit } from "lucide-react"
-
-interface Gestante {
-  id: string
-  nome: string
-  dataNascimento: string | null
-  cartaoSus: string
-  telefone: string | null
-  ubsId: string
-  dum: string
-  dpp: string
-  semanasInicioPreNatal: number
-  etnia: string
-  gestacoesAnteriores: number
-  risco: string
-  descricaoRisco: string | null
-  motivoAltoRisco: string | null
-  exameRotina1Trimestre: boolean
-  exameRotina2Trimestre: boolean
-  exameRotina3Trimestre: boolean
-  ultrassom1Trimestre: boolean
-  ultrassom2Trimestre: boolean
-  ultrassom3Trimestre: boolean
-  vacinaHB: boolean
-  vacinaDT: boolean
-  vacinaInfluenza: boolean
-  vacinaCovid19: boolean
-  vacinaDTPA20Semana: boolean
-  vacinaVSR28Semana: boolean
-}
-
-const formatCartaoSus = (value: string) => {
-  const digits = value.replace(/\D/g, "").slice(0, 15)
-  const parts = []
-  if (digits.length > 0) parts.push(digits.slice(0, 3))
-  if (digits.length > 3) parts.push(digits.slice(3, 7))
-  if (digits.length > 7) parts.push(digits.slice(7, 11))
-  if (digits.length > 11) parts.push(digits.slice(11, 15))
-  return parts.join(" ")
-}
-
-const formatTelefone = (value: string) => {
-  const digits = value.replace(/\D/g, "").slice(0, 11)
-  if (digits.length <= 2) return digits
-  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
-  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
-  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
-}
-
-const formatDate = (value: string) => new Date(value).toLocaleDateString("pt-BR")
-
-const yesNo = (value: boolean) => (value ? "Sim" : "Não")
-
-const calculateWeeks = (dum: string) => {
-  const dumDate = new Date(dum)
-  const today = new Date()
-  const diffTime = today.getTime() - dumDate.getTime()
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-  const weeks = Math.floor(diffDays / 7)
-  return weeks >= 0 ? weeks : 0
-}
+import {
+  calculateWeeks,
+  formatCartaoSus,
+  formatDate,
+  formatTelefone,
+  getRiscoColor,
+  yesNo,
+} from "@/lib/formatters"
+import type { GestanteDetail } from "@/types/gestante"
 
 export default function VisualizarGestantePage() {
   const params = useParams()
   const id = params.id as string
-  const [gestante, setGestante] = useState<Gestante | null>(null)
+  const [gestante, setGestante] = useState<GestanteDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -96,7 +45,10 @@ export default function VisualizarGestantePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <p className="text-muted-foreground">Carregando gestante...</p>
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-muted-foreground">Carregando gestante...</p>
+        </div>
       </div>
     )
   }
@@ -114,7 +66,7 @@ export default function VisualizarGestantePage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <Link href="/">
             <Button variant="outline" size="icon">
@@ -122,7 +74,7 @@ export default function VisualizarGestantePage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">{gestante.nome}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">{gestante.nome}</h1>
             <p className="text-muted-foreground">Informações completas do cadastro</p>
           </div>
         </div>
@@ -143,12 +95,12 @@ export default function VisualizarGestantePage() {
           <InfoItem label="Nome" value={gestante.nome} />
           <InfoItem label="Cartão SUS" value={formatCartaoSus(gestante.cartaoSus || "")} />
           <InfoItem label="Data de Nascimento" value={gestante.dataNascimento ? formatDate(gestante.dataNascimento) : "-"} />
-          <InfoItem label="Telefone" value={formatTelefone(gestante.telefone || "")} />
+          <InfoItem label="Telefone" value={gestante.telefone ? formatTelefone(gestante.telefone) : "-"} />
           <InfoItem label="DUM" value={formatDate(gestante.dum)} />
           <InfoItem label="DPP" value={formatDate(gestante.dpp)} />
           <InfoItem label="Início do Pré-natal" value={`${gestante.semanasInicioPreNatal} semanas`} />
           <InfoItem label="Semanas de Gestação" value={`${calculateWeeks(gestante.dum)} semanas`} />
-          <InfoItem label="UBS" value={gestante.ubsId} />
+          <InfoItem label="UBS" value={gestante.ubs?.nome ?? "—"} />
           <InfoItem label="Etnia" value={gestante.etnia} />
           <InfoItem label="Gestações Anteriores" value={gestante.gestacoesAnteriores.toString()} />
         </CardContent>
@@ -160,34 +112,41 @@ export default function VisualizarGestantePage() {
           <CardDescription>Informações clínicas</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <InfoItem label="Nível de Risco" value={gestante.risco} />
+          <div className="flex flex-col rounded-lg border border-border p-3">
+            <span className="text-sm text-muted-foreground">Nível de Risco</span>
+            <span
+              className={`mt-1 inline-flex w-fit items-center rounded-full border px-3 py-1 text-xs font-medium ${getRiscoColor(gestante.risco)}`}
+            >
+              {gestante.risco}
+            </span>
+          </div>
           <InfoItem label="Descrição/Observação" value={gestante.descricaoRisco || "-"} />
           <InfoItem label="Motivo Alto Risco" value={gestante.motivoAltoRisco || "-"} />
         </CardContent>
       </Card>
 
-      <Card className="grid grid-cols-2 justify-center">
-        <Card className="border-none shadow-none">
-        <CardHeader>
-          <CardTitle>Exames de Rotina</CardTitle>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Exames de Rotina</CardTitle>
           </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-4">
-          <InfoItem label="Rotina 1º trimestre" value={yesNo(gestante.exameRotina1Trimestre)} />
-          <InfoItem label="Rotina 2º trimestre" value={yesNo(gestante.exameRotina2Trimestre)} />
-          <InfoItem label="Rotina 3º trimestre" value={yesNo(gestante.exameRotina3Trimestre)} />
-        </CardContent>
-      </Card>
-      <Card className="border-none shadow-none">
-        <CardHeader>
-          <CardTitle>Ultrassom</CardTitle>
+          <CardContent className="grid grid-cols-1 gap-4">
+            <InfoItem label="Rotina 1º trimestre" value={yesNo(gestante.exameRotina1Trimestre)} />
+            <InfoItem label="Rotina 2º trimestre" value={yesNo(gestante.exameRotina2Trimestre)} />
+            <InfoItem label="Rotina 3º trimestre" value={yesNo(gestante.exameRotina3Trimestre)} />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Ultrassom</CardTitle>
           </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-4">
-          <InfoItem label="Ultrassom 1º trimestre" value={yesNo(gestante.ultrassom1Trimestre)} />
-          <InfoItem label="Ultrassom 2º trimestre" value={yesNo(gestante.ultrassom2Trimestre)} />
-          <InfoItem label="Ultrassom 3º trimestre" value={yesNo(gestante.ultrassom3Trimestre)} />
-        </CardContent>
-      </Card>
-      </Card>
+          <CardContent className="grid grid-cols-1 gap-4">
+            <InfoItem label="Ultrassom 1º trimestre" value={yesNo(gestante.ultrassom1Trimestre)} />
+            <InfoItem label="Ultrassom 2º trimestre" value={yesNo(gestante.ultrassom2Trimestre)} />
+            <InfoItem label="Ultrassom 3º trimestre" value={yesNo(gestante.ultrassom3Trimestre)} />
+          </CardContent>
+        </Card>
+      </div>
 
       <Card>
         <CardHeader>
@@ -215,5 +174,3 @@ function InfoItem({ label, value }: { label: string; value: string }) {
     </div>
   )
 }
-
-
