@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BRAÇOS ABERTOS — MAPS-CS",
+  title: "MAPS-CS",
   description: "Sistema de monitoramento de gestantes na Atenção Primária à Saúde — Campos Sales",
 };
 

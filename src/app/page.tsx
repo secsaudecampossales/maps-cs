@@ -13,6 +13,7 @@ import {
   calculateWeeks,
   formatDate,
   getRiscoColor,
+  isGestacaoAtiva,
   isPartoEsteMes,
   isPartoUltimos3Meses,
 } from "@/lib/formatters"
@@ -132,6 +133,8 @@ export default function Dashboard() {
   }
 
   const filteredGestantes = gestantes.filter((gestante) => {
+    if (!isGestacaoAtiva(gestante.dum)) return false
+
     const term = searchTerm.trim().toLowerCase()
 
     const matchesSearch =

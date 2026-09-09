@@ -49,8 +49,8 @@ export default function LoginPage() {
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-sky-500 shadow-md">
             <Activity className="h-7 w-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-blue-700">BRAÇOS ABERTOS</h1>
-          <p className="text-sm text-muted-foreground mt-1">MAPS-CS</p>
+          <h1 className="text-2xl font-bold text-blue-700">MAPS-CS</h1>
+          <p className="text-sm text-muted-foreground mt-1">APS Campos Sales</p>
           <p className="text-xs text-muted-foreground mt-2">
             Monitoramento da Atenção Primária em Saúde — Campos Sales
           </p>

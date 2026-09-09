@@ -3,6 +3,7 @@ import { prisma } from "../../../../lib/prisma"
 import { startOfMonth, endOfMonth } from "date-fns"
 import { getAuthSession, requireAuth } from "../../../../lib/auth-api"
 import { removeGestantesPosTresMeses } from "../../../../lib/gestantes"
+import { isGestacaoAtiva } from "../../../../lib/formatters"
 
 // GET - Estatísticas das gestantes
 export async function GET(request: NextRequest) {
@@ -27,51 +28,32 @@ export async function GET(request: NextRequest) {
       : { ubsId: session.user.ubsId! }
 
     await removeGestantesPosTresMeses()
-    const totalGestantes = await prisma.gestante.count({
+
+    const gestantes = await prisma.gestante.findMany({
       where: whereClause,
+      select: { risco: true, dpp: true, dum: true },
     })
-    
-    const gestantesAltoRisco = await prisma.gestante.count({
-      where: {
-        ...whereClause,
-        risco: "Risco Alto",
-      },
-    })
+    const gestantesAtivas = gestantes.filter((g) => isGestacaoAtiva(g.dum))
 
-    const gestantesRiscoIntermediario = await prisma.gestante.count({
-      where: {
-        ...whereClause,
-        risco: "Risco Intermediário",
-      },
-    })
+    const totalGestantes = gestantesAtivas.length
+    const gestantesAltoRisco = gestantesAtivas.filter((g) => g.risco === "Risco Alto").length
+    const gestantesRiscoIntermediario = gestantesAtivas.filter(
+      (g) => g.risco === "Risco Intermediário"
+    ).length
 
-    // Contar partos deste mês (DPP no mês atual)
     const inicioMes = startOfMonth(new Date())
     const fimMes = endOfMonth(new Date())
-    
-    const partosEsteMes = await prisma.gestante.count({
-      where: {
-        ...whereClause,
-        dpp: {
-          gte: inicioMes,
-          lte: fimMes,
-        },
-      },
-    })
-
-    // Contar partos dos últimos 3 meses
+    const hoje = new Date()
     const tresMesesAtras = new Date()
     tresMesesAtras.setMonth(tresMesesAtras.getMonth() - 3)
 
-    const partosDosUltimos3Meses = await prisma.gestante.count({
-      where: {
-        ...whereClause,
-        dpp: {
-          gte: tresMesesAtras,
-          lte: new Date(),
-        },
-      },
-    })
+    const partosEsteMes = gestantesAtivas.filter(
+      (g) => g.dpp >= inicioMes && g.dpp <= fimMes
+    ).length
+
+    const partosDosUltimos3Meses = gestantesAtivas.filter(
+      (g) => g.dpp >= tresMesesAtras && g.dpp <= hoje
+    ).length
 
     return NextResponse.json({
       totalGestantes,

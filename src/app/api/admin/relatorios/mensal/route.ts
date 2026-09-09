@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../../../../lib/prisma"
 import { requireAdmin } from "../../../../../lib/auth-api"
 import { startOfMonth, endOfMonth } from "date-fns"
+import { isGestacaoAtiva } from "../../../../../lib/formatters"
 
 const MESES = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -46,29 +47,33 @@ export async function GET(request: NextRequest) {
     const inicio = startOfMonth(new Date(ano, mes - 1, 1))
     const fim = endOfMonth(new Date(ano, mes - 1, 1))
 
-    // 1. Gestantes CADASTRADAS no mês
-    const gestantesCadastradas = await prisma.gestante.findMany({
+    // 1. Gestantes CADASTRADAS no mês (excluindo >42 semanas)
+    const gestantesCadastradasRaw = await prisma.gestante.findMany({
       where: { createdAt: { gte: inicio, lte: fim } },
       include: { ubs: { select: { nome: true } } },
     })
+    const gestantesCadastradas = gestantesCadastradasRaw.filter((g) => isGestacaoAtiva(g.dum))
 
-    // 2. Gestantes ATUALIZADAS no mês (excluindo cadastros do mesmo mês)
-    const gestantesAtualizadas = await prisma.gestante.findMany({
+    // 2. Gestantes ATUALIZADAS no mês (excluindo cadastros do mesmo mês e >42 semanas)
+    const gestantesAtualizadasRaw = await prisma.gestante.findMany({
       where: {
         updatedAt: { gte: inicio, lte: fim },
         createdAt: { lt: inicio }, // cadastradas antes do mês
       },
     })
+    const gestantesAtualizadas = gestantesAtualizadasRaw.filter((g) => isGestacaoAtiva(g.dum))
 
-    // 3. Partos no mês (DPP no mês)
-    const partosNoMes = await prisma.gestante.count({
+    // 3. Partos no mês (DPP no mês, excluindo >42 semanas)
+    const partosNoMesRaw = await prisma.gestante.findMany({
       where: {
         dpp: { gte: inicio, lte: fim },
       },
+      select: { dum: true },
     })
+    const partosNoMes = partosNoMesRaw.filter((g) => isGestacaoAtiva(g.dum)).length
 
     // 4. Exames e vacinas (entre gestantes com atividade no mês: cadastradas OU atualizadas)
-    const gestantesComAtividade = await prisma.gestante.findMany({
+    const gestantesComAtividadeRaw = await prisma.gestante.findMany({
       where: {
         OR: [
           { createdAt: { gte: inicio, lte: fim } },
@@ -79,6 +84,7 @@ export async function GET(request: NextRequest) {
         ],
       },
       select: {
+        dum: true,
         exameRotina1Trimestre: true,
         exameRotina2Trimestre: true,
         exameRotina3Trimestre: true,
@@ -93,6 +99,7 @@ export async function GET(request: NextRequest) {
         vacinaVSR28Semana: true,
       },
     })
+    const gestantesComAtividade = gestantesComAtividadeRaw.filter((g) => isGestacaoAtiva(g.dum))
 
     const examesKeys = [
       "exameRotina1Trimestre", "exameRotina2Trimestre", "exameRotina3Trimestre",

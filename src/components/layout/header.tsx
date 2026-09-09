@@ -54,10 +54,10 @@ export function Header() {
           </div>
           <div className="flex flex-col min-w-0">
             <h1 className="text-lg md:text-xl font-semibold tracking-tight text-white truncate">
-              BRAÇOS ABERTOS
+              MAPS-CS
             </h1>
             <span className="text-[11px] md:text-xs text-sky-100/95 truncate">
-              MAPS-CS • APS Campos Sales
+              APS Campos Sales
             </span>
           </div>
         </Link>

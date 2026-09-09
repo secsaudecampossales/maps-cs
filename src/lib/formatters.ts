@@ -28,12 +28,18 @@ export function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString("pt-BR")
 }
 
-export function calculateWeeks(dum: string): number {
-  const dumDate = new Date(dum)
+export const MAX_SEMANAS_GESTACAO = 42
+
+export function calculateWeeks(dum: string | Date): number {
+  const dumDate = typeof dum === "string" ? new Date(dum) : dum
   const today = new Date()
   const diffDays = Math.floor((today.getTime() - dumDate.getTime()) / (1000 * 60 * 60 * 24))
   const weeks = Math.floor(diffDays / 7)
   return weeks >= 0 ? weeks : 0
+}
+
+export function isGestacaoAtiva(dum: string | Date): boolean {
+  return calculateWeeks(dum) <= MAX_SEMANAS_GESTACAO
 }
 
 export function getRiscoColor(risco: string): string {

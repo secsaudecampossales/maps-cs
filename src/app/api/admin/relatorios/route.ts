@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../../../lib/prisma"
 import { requireAdmin } from "../../../../lib/auth-api"
-
-// Função auxiliar para calcular semanas de gestação
-function calcularSemanas(dum: Date): number {
-  const hoje = new Date()
-  const diffTime = hoje.getTime() - dum.getTime()
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-  const weeks = Math.floor(diffDays / 7)
-  return weeks >= 0 ? weeks : 0
-}
+import { calculateWeeks, isGestacaoAtiva } from "../../../../lib/formatters"
 
 function calcularIdade(dataNascimento: Date): number {
   const hoje = new Date()
@@ -199,18 +191,13 @@ export async function GET(request: NextRequest) {
     })
 
     // Filtrar por semanas de gestação (após buscar do banco, pois é calculado)
-    // Sempre filtrar gestantes com mais de 41 semanas (não devem aparecer no relatório)
-    let gestantesFiltradas = gestantes.filter((g) => {
-      const semanas = calcularSemanas(new Date(g.dum))
-      // Sempre excluir gestantes com mais de 41 semanas
-      if (semanas > 41) return false
-      return true
-    })
+    // Sempre excluir gestantes com mais de 42 semanas
+    let gestantesFiltradas = gestantes.filter((g) => isGestacaoAtiva(g.dum))
 
     // Aplicar filtros adicionais de semanas se especificados
     if (semanasMin || semanasMax) {
       gestantesFiltradas = gestantesFiltradas.filter((g) => {
-        const semanas = calcularSemanas(new Date(g.dum))
+        const semanas = calculateWeeks(g.dum)
         if (semanasMin && semanas < parseInt(semanasMin)) return false
         if (semanasMax && semanas > parseInt(semanasMax)) return false
         return true
@@ -230,7 +217,7 @@ export async function GET(request: NextRequest) {
     // Adicionar semanas de gestação calculadas e outras informações úteis
     const gestantesComInfo = gestantesFiltradas.map((g) => ({
       ...g,
-      semanasGestacao: calcularSemanas(new Date(g.dum)),
+      semanasGestacao: calculateWeeks(g.dum),
       idade: g.dataNascimento ? calcularIdade(new Date(g.dataNascimento)) : null,
       nomeUBS: g.ubs.nome,
       enderecoUBS: g.ubs.endereco,
