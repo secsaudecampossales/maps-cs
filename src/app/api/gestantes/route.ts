@@ -3,7 +3,7 @@ import { prisma } from "../../../lib/prisma"
 import { addDays } from "date-fns"
 import { getAuthSession, requireAuth } from "../../../lib/auth-api"
 import { removeGestantesPosTresMeses } from "../../../lib/gestantes"
-import { isGestacaoAtiva } from "../../../lib/formatters"
+import { compactDefined, isAcompanhamentoAtivo, parseMonitoramentoFields } from "../../../lib/monitoramento"
 
 // GET - Listar todas as gestantes
 export async function GET(request: NextRequest) {
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         createdAt: "desc",
       },
     })
-    const gestantesAtivas = gestantes.filter((g) => isGestacaoAtiva(g.dum))
+    const gestantesAtivas = gestantes.filter((g) => isAcompanhamentoAtivo(g.dum, g.desfecho))
     return NextResponse.json(gestantesAtivas, {
       headers: {
         'Content-Type': 'application/json',
@@ -180,6 +180,7 @@ export async function POST(request: NextRequest) {
 
     // Calcular DPP (DUM + 280 dias)
     const dpp = addDays(new Date(dum), 280)
+    const monitoramento = compactDefined(parseMonitoramentoFields(body))
 
     const gestante = await prisma.gestante.create({
       data: {
@@ -208,6 +209,7 @@ export async function POST(request: NextRequest) {
         vacinaCovid19: vacinas?.covid19 || false,
         vacinaDTPA20Semana: vacinas?.dtpa20Semana || false,
         vacinaVSR28Semana: vacinas?.vsr28Semana || false,
+        ...monitoramento,
       },
     })
 

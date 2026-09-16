@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../../../../lib/prisma"
 import { requireAdmin } from "../../../../../lib/auth-api"
-import { startOfMonth, endOfMonth } from "date-fns"
+import { startOfMonth, endOfMonth, startOfYear } from "date-fns"
 import { isGestacaoAtiva } from "../../../../../lib/formatters"
+import { montarPlanilhaMonitoramento } from "../../../../../lib/monitoramento"
 
 const MESES = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -46,6 +47,48 @@ export async function GET(request: NextRequest) {
 
     const inicio = startOfMonth(new Date(ano, mes - 1, 1))
     const fim = endOfMonth(new Date(ano, mes - 1, 1))
+    const inicioAno = startOfYear(new Date(ano, 0, 1))
+
+    const [gestantesMonitoramento, excluidasDesfecho, indicador] = await Promise.all([
+      prisma.gestante.findMany({
+        select: {
+          dum: true,
+          desfecho: true,
+          dataDesfecho: true,
+          createdAt: true,
+          semanasInicioPreNatal: true,
+          numeroConsultas: true,
+          exameRotina1Trimestre: true,
+          exameRotina3Trimestre: true,
+          testesRapidos1Trimestre: true,
+          testesRapidos3Trimestre: true,
+          risco: true,
+          planoDeCuidados: true,
+          gestaoDeCaso: true,
+          vinculadaMaternidade: true,
+          destinoAAE: true,
+          statusAAE: true,
+          dataEncaminhamentoAAE: true,
+          dataAcessoAAE: true,
+        },
+      }),
+      prisma.gestanteExcluida.findMany({
+        where: {
+          desfecho: { not: "em_andamento" },
+          dataDesfecho: { gte: inicioAno, lte: fim },
+        },
+        select: { desfecho: true, dataDesfecho: true },
+      }),
+      prisma.indicadorMunicipal.findUnique({ where: { ano } }),
+    ])
+
+    const planilhaMonitoramento = montarPlanilhaMonitoramento(
+      gestantesMonitoramento,
+      excluidasDesfecho,
+      indicador?.gestantesEstimadas ?? 0,
+      inicioAno,
+      fim
+    )
 
     // 1. Gestantes CADASTRADAS no mês (excluindo >42 semanas)
     const gestantesCadastradasRaw = await prisma.gestante.findMany({
@@ -160,6 +203,7 @@ export async function GET(request: NextRequest) {
       porEtnia: Object.entries(porEtnia).map(([etnia, qtd]) => ({ etnia, quantidade: qtd })),
       porUBS: Object.entries(porUBS).map(([ubs, qtd]) => ({ ubs, quantidade: qtd })),
       examesPorTipo,
+      planilhaMonitoramento,
     })
   } catch (error) {
     console.error("Erro ao gerar relatório mensal:", error)

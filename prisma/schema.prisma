@@ -69,6 +69,21 @@ model Gestante {
   vacinaDTPA20Semana     Boolean @default(false)
   vacinaVSR28Semana      Boolean @default(false)
 
+  // Planilha de monitoramento municipal
+  testesRapidos1Trimestre Boolean @default(false)
+  testesRapidos3Trimestre Boolean @default(false)
+  numeroConsultas         Int     @default(0)
+  planoDeCuidados         Boolean @default(false)
+  gestaoDeCaso            Boolean @default(false)
+  vinculadaMaternidade    Boolean @default(false)
+  nomeMaternidade         String?
+  destinoAAE              String? // Policlínica | Ambulatório Municipal
+  statusAAE               String  @default("nao_encaminhada") // nao_encaminhada | aguardando_vaga | compartilhada
+  dataEncaminhamentoAAE   DateTime?
+  dataAcessoAAE           DateTime?
+  desfecho                String  @default("em_andamento") // em_andamento | nascido | obito_fetal | obito_infantil | obito_materno
+  dataDesfecho            DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -108,6 +123,20 @@ model GestanteExcluida {
   vacinaDTPA20Semana     Boolean
   vacinaVSR28Semana      Boolean
 
+  testesRapidos1Trimestre Boolean @default(false)
+  testesRapidos3Trimestre Boolean @default(false)
+  numeroConsultas         Int     @default(0)
+  planoDeCuidados         Boolean @default(false)
+  gestaoDeCaso            Boolean @default(false)
+  vinculadaMaternidade    Boolean @default(false)
+  nomeMaternidade         String?
+  destinoAAE              String?
+  statusAAE               String  @default("nao_encaminhada")
+  dataEncaminhamentoAAE   DateTime?
+  dataAcessoAAE           DateTime?
+  desfecho                String  @default("em_andamento")
+  dataDesfecho            DateTime?
+
   // Informações sobre a exclusão
   enfermeiroId        String? // ID do enfermeiro que excluiu (null se foi exclusão automática)
   enfermeiro          Enfermeiro? @relation(fields: [enfermeiroId], references: [id], onDelete: SetNull)
@@ -117,4 +146,12 @@ model GestanteExcluida {
   // Datas originais de criação e atualização
   createdAtOriginal   DateTime
   updatedAtOriginal   DateTime
+}
+
+model IndicadorMunicipal {
+  id                 String   @id @default(cuid())
+  ano                Int      @unique
+  gestantesEstimadas Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }

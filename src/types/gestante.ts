@@ -45,6 +45,19 @@ export interface GestanteDetail {
   vacinaCovid19: boolean
   vacinaDTPA20Semana: boolean
   vacinaVSR28Semana: boolean
+  testesRapidos1Trimestre: boolean
+  testesRapidos3Trimestre: boolean
+  numeroConsultas: number
+  planoDeCuidados: boolean
+  gestaoDeCaso: boolean
+  vinculadaMaternidade: boolean
+  nomeMaternidade: string | null
+  destinoAAE: string | null
+  statusAAE: string
+  dataEncaminhamentoAAE: string | null
+  dataAcessoAAE: string | null
+  desfecho: string
+  dataDesfecho: string | null
 }
 
 export interface DashboardStats {

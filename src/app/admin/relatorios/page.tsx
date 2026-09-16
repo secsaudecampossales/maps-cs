@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { BarChart3, Printer, UserPlus, FileEdit, Baby, Syringe } from "lucide-react"
 import Link from "next/link"
@@ -15,6 +16,35 @@ const MESES = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
 ]
+
+interface PlanilhaMonitoramento {
+  gestantesEstimadas: number
+  totalGestantesAteOMomento: number
+  nascidosNoAno: number
+  obitosFetaisNoAno: number
+  obitosInfantisNoAno: number
+  obitosMaternosNoAno: number
+  acompanhadasPreNatalUbs: number
+  captadasAte12Semanas: number
+  comMinimo7Consultas: number
+  exames1Trimestre: number
+  exames3Trimestre: number
+  testesRapidos1Trimestre: number
+  testesRapidos3Trimestre: number
+  estratificadas: number
+  riscoBaixo: number
+  riscoIntermediario: number
+  riscoAlto: number
+  comPlanoDeCuidados: number
+  emGestaoDeCaso: number
+  riscoIntermediarioCompartilhadas: { policlinica: number; ambulatorioMunicipal: number }
+  riscoIntermediarioAguardandoVaga: { policlinica: number; ambulatorioMunicipal: number }
+  mediaDiasAcessoRiscoIntermediario: { policlinica: number | null; ambulatorioMunicipal: number | null }
+  riscoAltoCompartilhadas: { policlinica: number; ambulatorioMunicipal: number }
+  riscoAltoAguardandoVaga: { policlinica: number; ambulatorioMunicipal: number }
+  mediaDiasAcessoRiscoAlto: { policlinica: number | null; ambulatorioMunicipal: number | null }
+  vinculadasMaternidade: number
+}
 
 interface RelatorioMensalData {
   periodo: { mes: number; ano: number; nomeMes: string }
@@ -28,6 +58,7 @@ interface RelatorioMensalData {
   porEtnia: { etnia: string; quantidade: number }[]
   porUBS: { ubs: string; quantidade: number }[]
   examesPorTipo: { tipo: string; quantidade: number; percentual: string }[]
+  planilhaMonitoramento: PlanilhaMonitoramento
 }
 
 export default function RelatoriosPage() {
@@ -37,6 +68,8 @@ export default function RelatoriosPage() {
   const [relatorio, setRelatorio] = useState<RelatorioMensalData | null>(null)
   const [mes, setMes] = useState(() => (new Date().getMonth() + 1).toString())
   const [ano, setAno] = useState(() => new Date().getFullYear().toString())
+  const [gestantesEstimadas, setGestantesEstimadas] = useState("0")
+  const [savingEstimadas, setSavingEstimadas] = useState(false)
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -58,6 +91,9 @@ export default function RelatoriosPage() {
       if (response.ok) {
         const data = await response.json()
         setRelatorio(data)
+        if (data.planilhaMonitoramento) {
+          setGestantesEstimadas(String(data.planilhaMonitoramento.gestantesEstimadas ?? 0))
+        }
       } else {
         const err = await response.json()
         alert(err.error || "Erro ao gerar relatório")
@@ -65,10 +101,38 @@ export default function RelatoriosPage() {
     } catch (error) {
       console.error("Erro ao gerar relatório:", error)
       alert("Erro ao gerar relatório")
-    } finally {
+    }     finally {
       setLoading(false)
     }
   }
+
+  const salvarEstimadas = async () => {
+    const valor = Number(gestantesEstimadas)
+    if (!Number.isInteger(valor) || valor < 0) {
+      alert("Informe um número válido de gestantes estimadas.")
+      return
+    }
+    setSavingEstimadas(true)
+    try {
+      const response = await fetch("/api/admin/indicadores", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ano: Number(ano), gestantesEstimadas: valor }),
+      })
+      if (!response.ok) {
+        const err = await response.json()
+        throw new Error(err.error || "Erro ao salvar")
+      }
+      await gerarRelatorio()
+    } catch (error) {
+      console.error(error)
+      alert(error instanceof Error ? error.message : "Erro ao salvar gestantes estimadas")
+    } finally {
+      setSavingEstimadas(false)
+    }
+  }
+
+  const mediaLabel = (valor: number | null | undefined) => (valor == null ? "—" : String(valor))
 
   const imprimirOuPDF = () => {
     if (!relatorio) return
@@ -112,7 +176,59 @@ export default function RelatoriosPage() {
     doc.text(`• Partos no mês: ${relatorio.resumo.partosNoMes}`, margin, yPos)
     yPos += 5
     doc.text(`• Exames e vacinas realizados: ${relatorio.resumo.totalExamesVacinas}`, margin, yPos)
-    yPos += 10
+    yPos += 12
+
+    if (relatorio.planilhaMonitoramento) {
+      const p = relatorio.planilhaMonitoramento
+      doc.setFontSize(12)
+      doc.setFont("helvetica", "bold")
+      doc.text("Planilha de monitoramento (Campos Sales)", margin, yPos)
+      yPos += 6
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [["Indicador", "Valor"]],
+        body: [
+          ["Gestantes estimadas no ano", String(p.gestantesEstimadas)],
+          ["Total de gestantes até o momento", String(p.totalGestantesAteOMomento)],
+          ["Nascidos no ano", String(p.nascidosNoAno)],
+          ["Óbitos fetais no ano", String(p.obitosFetaisNoAno)],
+          ["Óbitos infantis no ano", String(p.obitosInfantisNoAno)],
+          ["Óbitos maternos no ano", String(p.obitosMaternosNoAno)],
+          ["Acompanhadas no pré-natal na UBS", String(p.acompanhadasPreNatalUbs)],
+          ["Captadas até a 12ª semana", String(p.captadasAte12Semanas)],
+          ["Com no mínimo 7 consultas", String(p.comMinimo7Consultas)],
+          ["Exames realizados 1º trimestre", String(p.exames1Trimestre)],
+          ["Exames realizados 3º trimestre", String(p.exames3Trimestre)],
+          ["Testes rápidos 1º trimestre", String(p.testesRapidos1Trimestre)],
+          ["Testes rápidos 3º trimestre", String(p.testesRapidos3Trimestre)],
+          ["Estratificadas", String(p.estratificadas)],
+          ["Baixo risco", String(p.riscoBaixo)],
+          ["Risco intermediário", String(p.riscoIntermediario)],
+          ["Alto risco", String(p.riscoAlto)],
+          ["Com plano de cuidados", String(p.comPlanoDeCuidados)],
+          ["Em gestão de caso", String(p.emGestaoDeCaso)],
+          ["RI compartilhada - Policlínica", String(p.riscoIntermediarioCompartilhadas.policlinica)],
+          ["RI compartilhada - Ambulatório Municipal", String(p.riscoIntermediarioCompartilhadas.ambulatorioMunicipal)],
+          ["RI aguardando vaga - Policlínica", String(p.riscoIntermediarioAguardandoVaga.policlinica)],
+          ["RI aguardando vaga - Ambulatório Municipal", String(p.riscoIntermediarioAguardandoVaga.ambulatorioMunicipal)],
+          ["Média dias acesso RI - Policlínica", mediaLabel(p.mediaDiasAcessoRiscoIntermediario.policlinica)],
+          ["Média dias acesso RI - Ambulatório Municipal", mediaLabel(p.mediaDiasAcessoRiscoIntermediario.ambulatorioMunicipal)],
+          ["AR compartilhada - Policlínica", String(p.riscoAltoCompartilhadas.policlinica)],
+          ["AR compartilhada - Ambulatório Municipal", String(p.riscoAltoCompartilhadas.ambulatorioMunicipal)],
+          ["AR aguardando vaga - Policlínica", String(p.riscoAltoAguardandoVaga.policlinica)],
+          ["AR aguardando vaga - Ambulatório Municipal", String(p.riscoAltoAguardandoVaga.ambulatorioMunicipal)],
+          ["Média dias acesso AR - Policlínica", mediaLabel(p.mediaDiasAcessoRiscoAlto.policlinica)],
+          ["Média dias acesso AR - Ambulatório Municipal", mediaLabel(p.mediaDiasAcessoRiscoAlto.ambulatorioMunicipal)],
+          ["Vinculadas à maternidade", String(p.vinculadasMaternidade)],
+        ],
+        theme: "striped",
+        headStyles: { fillColor: [66, 139, 202], textColor: 255, fontStyle: "bold" },
+        margin: { left: margin, right: margin },
+      })
+      const lastTable = (doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable
+      yPos = (lastTable?.finalY ?? yPos) + 10
+    }
 
     // Por risco
     doc.setFontSize(11)
@@ -235,6 +351,20 @@ export default function RelatoriosPage() {
               {loading ? "Gerando..." : "Gerar Relatório"}
             </Button>
           </div>
+          <div className="mt-4 flex flex-wrap items-end gap-4">
+            <div className="space-y-2 min-w-[220px]">
+              <label className="text-sm font-medium">Gestantes estimadas no ano</label>
+              <Input
+                type="number"
+                min="0"
+                value={gestantesEstimadas}
+                onChange={(e) => setGestantesEstimadas(e.target.value)}
+              />
+            </div>
+            <Button type="button" variant="outline" onClick={salvarEstimadas} disabled={savingEstimadas}>
+              {savingEstimadas ? "Salvando..." : "Salvar estimativa do ano"}
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
@@ -254,6 +384,60 @@ export default function RelatoriosPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
+            {relatorio.planilhaMonitoramento && (
+              <div>
+                <h3 className="text-sm font-semibold mb-3">Planilha de monitoramento — Campos Sales</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Totais acumulados até {relatorio.periodo.nomeMes}/{relatorio.periodo.ano}, no formato da planilha oficial.
+                </p>
+                <div className="border rounded-lg overflow-x-auto">
+                  <table className="w-full text-sm min-w-[720px]">
+                    <tbody>
+                      {[
+                        ["Gestantes estimadas no ano", relatorio.planilhaMonitoramento.gestantesEstimadas],
+                        ["Total de gestantes até o momento", relatorio.planilhaMonitoramento.totalGestantesAteOMomento],
+                        ["Nascidos no ano", relatorio.planilhaMonitoramento.nascidosNoAno],
+                        ["Óbitos fetais no ano", relatorio.planilhaMonitoramento.obitosFetaisNoAno],
+                        ["Óbitos infantis no ano", relatorio.planilhaMonitoramento.obitosInfantisNoAno],
+                        ["Óbitos maternos no ano", relatorio.planilhaMonitoramento.obitosMaternosNoAno],
+                        ["Acompanhadas no pré-natal na UBS no momento", relatorio.planilhaMonitoramento.acompanhadasPreNatalUbs],
+                        ["Captadas até a 12ª semana", relatorio.planilhaMonitoramento.captadasAte12Semanas],
+                        ["Com no mínimo 7 consultas", relatorio.planilhaMonitoramento.comMinimo7Consultas],
+                        ["Exames realizados 1º trimestre", relatorio.planilhaMonitoramento.exames1Trimestre],
+                        ["Exames realizados 3º trimestre", relatorio.planilhaMonitoramento.exames3Trimestre],
+                        ["Testes rápidos 1º trimestre", relatorio.planilhaMonitoramento.testesRapidos1Trimestre],
+                        ["Testes rápidos 3º trimestre", relatorio.planilhaMonitoramento.testesRapidos3Trimestre],
+                        ["Estratificadas", relatorio.planilhaMonitoramento.estratificadas],
+                        ["Baixo risco", relatorio.planilhaMonitoramento.riscoBaixo],
+                        ["Risco intermediário", relatorio.planilhaMonitoramento.riscoIntermediario],
+                        ["Alto risco", relatorio.planilhaMonitoramento.riscoAlto],
+                        ["Com plano de cuidados", relatorio.planilhaMonitoramento.comPlanoDeCuidados],
+                        ["Em gestão de caso", relatorio.planilhaMonitoramento.emGestaoDeCaso],
+                        ["RI compartilhada — Policlínica", relatorio.planilhaMonitoramento.riscoIntermediarioCompartilhadas.policlinica],
+                        ["RI compartilhada — Ambulatório Municipal", relatorio.planilhaMonitoramento.riscoIntermediarioCompartilhadas.ambulatorioMunicipal],
+                        ["RI aguardando vaga — Policlínica", relatorio.planilhaMonitoramento.riscoIntermediarioAguardandoVaga.policlinica],
+                        ["RI aguardando vaga — Ambulatório Municipal", relatorio.planilhaMonitoramento.riscoIntermediarioAguardandoVaga.ambulatorioMunicipal],
+                        ["Média de dias de acesso RI — Policlínica", mediaLabel(relatorio.planilhaMonitoramento.mediaDiasAcessoRiscoIntermediario.policlinica)],
+                        ["Média de dias de acesso RI — Ambulatório Municipal", mediaLabel(relatorio.planilhaMonitoramento.mediaDiasAcessoRiscoIntermediario.ambulatorioMunicipal)],
+                        ["AR compartilhada — Policlínica", relatorio.planilhaMonitoramento.riscoAltoCompartilhadas.policlinica],
+                        ["AR compartilhada — Ambulatório Municipal", relatorio.planilhaMonitoramento.riscoAltoCompartilhadas.ambulatorioMunicipal],
+                        ["AR aguardando vaga — Policlínica", relatorio.planilhaMonitoramento.riscoAltoAguardandoVaga.policlinica],
+                        ["AR aguardando vaga — Ambulatório Municipal", relatorio.planilhaMonitoramento.riscoAltoAguardandoVaga.ambulatorioMunicipal],
+                        ["Média de dias de acesso AR — Policlínica", mediaLabel(relatorio.planilhaMonitoramento.mediaDiasAcessoRiscoAlto.policlinica)],
+                        ["Média de dias de acesso AR — Ambulatório Municipal", mediaLabel(relatorio.planilhaMonitoramento.mediaDiasAcessoRiscoAlto.ambulatorioMunicipal)],
+                        ["Vinculadas à maternidade", relatorio.planilhaMonitoramento.vinculadasMaternidade],
+                      ].map(([label, valor]) => (
+                        <tr key={String(label)} className="border-t">
+                          <td className="p-3 text-muted-foreground">{label}</td>
+                          <td className="p-3 text-right font-semibold">{valor}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
             {/* Resumo do mês */}
             <div>
               <h3 className="text-sm font-semibold mb-3">Resumo do Mês</h3>

@@ -19,6 +19,10 @@ import {
   sanitizeTelefone,
 } from "@/lib/formatters"
 import type { UBS } from "@/types/gestante"
+import {
+  CAMPOS_PLANILHA_INICIAL,
+  MonitoramentoPlanilhaFields,
+} from "@/components/gestante/monitoramento-planilha-fields"
 
 export default function NovaGestantePage() {
   const router = useRouter()
@@ -56,6 +60,7 @@ export default function NovaGestantePage() {
       dtpa20Semana: false,
       vsr28Semana: false,
     },
+    ...CAMPOS_PLANILHA_INICIAL,
   })
 
   useEffect(() => {
@@ -648,6 +653,25 @@ export default function NovaGestantePage() {
             </div>
           </CardContent>
         </Card>
+
+        <MonitoramentoPlanilhaFields
+          value={{
+            testesRapidos1Trimestre: formData.testesRapidos1Trimestre,
+            testesRapidos3Trimestre: formData.testesRapidos3Trimestre,
+            numeroConsultas: formData.numeroConsultas,
+            planoDeCuidados: formData.planoDeCuidados,
+            gestaoDeCaso: formData.gestaoDeCaso,
+            vinculadaMaternidade: formData.vinculadaMaternidade,
+            nomeMaternidade: formData.nomeMaternidade,
+            destinoAAE: formData.destinoAAE,
+            statusAAE: formData.statusAAE,
+            dataEncaminhamentoAAE: formData.dataEncaminhamentoAAE,
+            dataAcessoAAE: formData.dataAcessoAAE,
+            desfecho: formData.desfecho,
+            dataDesfecho: formData.dataDesfecho,
+          }}
+          onChange={(planilha) => setFormData({ ...formData, ...planilha })}
+        />
 
         {/* Botões de Ação */}
         <div className="flex justify-end gap-4">

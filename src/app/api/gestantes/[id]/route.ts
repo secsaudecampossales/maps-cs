@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../../../lib/prisma"
 import { addDays } from "date-fns"
 import { getAuthSession, requireAuth } from "../../../../lib/auth-api"
+import { compactDefined, parseMonitoramentoFields } from "../../../../lib/monitoramento"
+import { snapshotExclusao } from "../../../../lib/gestantes"
 
 // GET - Buscar gestante por ID
 export async function GET(
@@ -186,6 +188,7 @@ export async function PUT(
           vacinaDTPA20Semana: vacinas.dtpa20Semana ?? undefined,
           vacinaVSR28Semana: vacinas.vsr28Semana ?? undefined,
         }),
+        ...compactDefined(parseMonitoramentoFields(body)),
       },
     })
 
@@ -239,35 +242,9 @@ export async function DELETE(
     try {
       await prisma.gestanteExcluida.create({
         data: {
-          nome: gestanteAtual.nome,
-          dataNascimento: gestanteAtual.dataNascimento,
-          cartaoSus: gestanteAtual.cartaoSus,
-            telefone: gestanteAtual.telefone,
-          ubsId: gestanteAtual.ubsId,
-          dum: gestanteAtual.dum,
-          dpp: gestanteAtual.dpp,
-          semanasInicioPreNatal: gestanteAtual.semanasInicioPreNatal,
-          etnia: gestanteAtual.etnia,
-          gestacoesAnteriores: gestanteAtual.gestacoesAnteriores,
-          risco: gestanteAtual.risco,
-          descricaoRisco: gestanteAtual.descricaoRisco,
-          motivoAltoRisco: gestanteAtual.motivoAltoRisco,
-          exameRotina1Trimestre: gestanteAtual.exameRotina1Trimestre,
-          exameRotina2Trimestre: gestanteAtual.exameRotina2Trimestre,
-          exameRotina3Trimestre: gestanteAtual.exameRotina3Trimestre,
-          ultrassom1Trimestre: gestanteAtual.ultrassom1Trimestre,
-          ultrassom2Trimestre: gestanteAtual.ultrassom2Trimestre,
-          ultrassom3Trimestre: gestanteAtual.ultrassom3Trimestre,
-          vacinaHB: gestanteAtual.vacinaHB,
-          vacinaDT: gestanteAtual.vacinaDT,
-          vacinaInfluenza: gestanteAtual.vacinaInfluenza,
-          vacinaCovid19: gestanteAtual.vacinaCovid19,
-          vacinaDTPA20Semana: gestanteAtual.vacinaDTPA20Semana,
-          vacinaVSR28Semana: gestanteAtual.vacinaVSR28Semana,
+          ...snapshotExclusao(gestanteAtual),
           enfermeiroId: session.user.id,
           motivoExclusao: "manual",
-          createdAtOriginal: gestanteAtual.createdAt,
-          updatedAtOriginal: gestanteAtual.updatedAt,
         },
       })
     } catch (auditError) {

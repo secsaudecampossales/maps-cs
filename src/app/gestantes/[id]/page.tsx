@@ -19,6 +19,10 @@ import {
   sanitizeTelefone,
 } from "@/lib/formatters"
 import type { GestanteDetail, UBS } from "@/types/gestante"
+import {
+  CAMPOS_PLANILHA_INICIAL,
+  MonitoramentoPlanilhaFields,
+} from "@/components/gestante/monitoramento-planilha-fields"
 
 export default function EditarGestantePage() {
   const router = useRouter()
@@ -59,6 +63,7 @@ export default function EditarGestantePage() {
       dtpa20Semana: false,
       vsr28Semana: false,
     },
+    ...CAMPOS_PLANILHA_INICIAL,
   })
 
   useEffect(() => {
@@ -115,6 +120,25 @@ export default function EditarGestantePage() {
             dtpa20Semana: gestante.vacinaDTPA20Semana,
             vsr28Semana: gestante.vacinaVSR28Semana,
           },
+          testesRapidos1Trimestre: gestante.testesRapidos1Trimestre,
+          testesRapidos3Trimestre: gestante.testesRapidos3Trimestre,
+          numeroConsultas: String(gestante.numeroConsultas ?? 0),
+          planoDeCuidados: gestante.planoDeCuidados,
+          gestaoDeCaso: gestante.gestaoDeCaso,
+          vinculadaMaternidade: gestante.vinculadaMaternidade,
+          nomeMaternidade: gestante.nomeMaternidade || "",
+          destinoAAE: gestante.destinoAAE || "",
+          statusAAE: gestante.statusAAE || "nao_encaminhada",
+          dataEncaminhamentoAAE: gestante.dataEncaminhamentoAAE
+            ? format(new Date(gestante.dataEncaminhamentoAAE), "yyyy-MM-dd")
+            : "",
+          dataAcessoAAE: gestante.dataAcessoAAE
+            ? format(new Date(gestante.dataAcessoAAE), "yyyy-MM-dd")
+            : "",
+          desfecho: gestante.desfecho || "em_andamento",
+          dataDesfecho: gestante.dataDesfecho
+            ? format(new Date(gestante.dataDesfecho), "yyyy-MM-dd")
+            : "",
         })
       } else {
         alert("Gestante não encontrada")
@@ -720,6 +744,25 @@ export default function EditarGestantePage() {
             </div>
           </CardContent>
         </Card>
+
+        <MonitoramentoPlanilhaFields
+          value={{
+            testesRapidos1Trimestre: formData.testesRapidos1Trimestre,
+            testesRapidos3Trimestre: formData.testesRapidos3Trimestre,
+            numeroConsultas: formData.numeroConsultas,
+            planoDeCuidados: formData.planoDeCuidados,
+            gestaoDeCaso: formData.gestaoDeCaso,
+            vinculadaMaternidade: formData.vinculadaMaternidade,
+            nomeMaternidade: formData.nomeMaternidade,
+            destinoAAE: formData.destinoAAE,
+            statusAAE: formData.statusAAE,
+            dataEncaminhamentoAAE: formData.dataEncaminhamentoAAE,
+            dataAcessoAAE: formData.dataAcessoAAE,
+            desfecho: formData.desfecho,
+            dataDesfecho: formData.dataDesfecho,
+          }}
+          onChange={(planilha) => setFormData({ ...formData, ...planilha })}
+        />
 
         {/* Botões de Ação */}
         <div className="flex justify-end gap-4">

@@ -3,7 +3,7 @@ import { prisma } from "../../../../lib/prisma"
 import { startOfMonth, endOfMonth } from "date-fns"
 import { getAuthSession, requireAuth } from "../../../../lib/auth-api"
 import { removeGestantesPosTresMeses } from "../../../../lib/gestantes"
-import { isGestacaoAtiva } from "../../../../lib/formatters"
+import { isAcompanhamentoAtivo } from "../../../../lib/monitoramento"
 
 // GET - Estatísticas das gestantes
 export async function GET(request: NextRequest) {
@@ -31,9 +31,9 @@ export async function GET(request: NextRequest) {
 
     const gestantes = await prisma.gestante.findMany({
       where: whereClause,
-      select: { risco: true, dpp: true, dum: true },
+      select: { risco: true, dpp: true, dum: true, desfecho: true },
     })
-    const gestantesAtivas = gestantes.filter((g) => isGestacaoAtiva(g.dum))
+    const gestantesAtivas = gestantes.filter((g) => isAcompanhamentoAtivo(g.dum, g.desfecho))
 
     const totalGestantes = gestantesAtivas.length
     const gestantesAltoRisco = gestantesAtivas.filter((g) => g.risco === "Risco Alto").length

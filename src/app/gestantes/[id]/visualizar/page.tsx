@@ -162,6 +162,59 @@ export default function VisualizarGestantePage() {
           <InfoItem label="VSR 28ª semana" value={yesNo(gestante.vacinaVSR28Semana)} />
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Planilha de monitoramento</CardTitle>
+          <CardDescription>Consultas, testes rápidos, AAE, maternidade e desfecho</CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InfoItem label="Testes rápidos 1º trimestre" value={yesNo(gestante.testesRapidos1Trimestre)} />
+          <InfoItem label="Testes rápidos 3º trimestre" value={yesNo(gestante.testesRapidos3Trimestre)} />
+          <InfoItem label="Nº de consultas" value={String(gestante.numeroConsultas ?? 0)} />
+          <InfoItem label="Plano de cuidados" value={yesNo(gestante.planoDeCuidados)} />
+          <InfoItem label="Gestão de caso" value={yesNo(gestante.gestaoDeCaso)} />
+          <InfoItem label="Vinculada à maternidade" value={yesNo(gestante.vinculadaMaternidade)} />
+          <InfoItem label="Maternidade" value={gestante.nomeMaternidade || "-"} />
+          <InfoItem
+            label="Situação na AAE"
+            value={
+              gestante.statusAAE === "compartilhada"
+                ? "Compartilhada"
+                : gestante.statusAAE === "aguardando_vaga"
+                  ? "Aguardando vaga"
+                  : "Não encaminhada"
+            }
+          />
+          <InfoItem label="Destino AAE" value={gestante.destinoAAE || "-"} />
+          <InfoItem
+            label="Data do encaminhamento"
+            value={gestante.dataEncaminhamentoAAE ? formatDate(gestante.dataEncaminhamentoAAE) : "-"}
+          />
+          <InfoItem
+            label="Data de acesso à AAE"
+            value={gestante.dataAcessoAAE ? formatDate(gestante.dataAcessoAAE) : "-"}
+          />
+          <InfoItem
+            label="Desfecho"
+            value={
+              gestante.desfecho === "nascido"
+                ? "Nascido vivo"
+                : gestante.desfecho === "obito_fetal"
+                  ? "Óbito fetal"
+                  : gestante.desfecho === "obito_infantil"
+                    ? "Óbito infantil"
+                    : gestante.desfecho === "obito_materno"
+                      ? "Óbito materno"
+                      : "Em andamento"
+            }
+          />
+          <InfoItem
+            label="Data do desfecho"
+            value={gestante.dataDesfecho ? formatDate(gestante.dataDesfecho) : "-"}
+          />
+        </CardContent>
+      </Card>
     </div>
   )
 }
