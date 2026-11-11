@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../../../lib/prisma"
+import { Prisma } from "@prisma/client"
 import { requireAdmin } from "../../../../lib/auth-api"
 import { calculateWeeks, isGestacaoAtiva } from "../../../../lib/formatters"
 
@@ -53,7 +54,7 @@ export async function GET(request: NextRequest) {
     const partoProximos3Meses = searchParams.get("partoProximos3Meses")
 
     // Construir filtros dinâmicos
-    const where: any = {}
+    const where: Prisma.GestanteWhereInput = {}
 
     if (ubsId) {
       where.ubsId = ubsId
@@ -69,37 +70,26 @@ export async function GET(request: NextRequest) {
 
     // Filtro por data de cadastro
     if (dataInicio || dataFim) {
-      where.createdAt = {}
-      if (dataInicio) {
-        where.createdAt.gte = new Date(dataInicio)
-      }
-      if (dataFim) {
-        where.createdAt.lte = new Date(dataFim)
-      }
+      const createdAtFilter: Prisma.DateTimeFilter = {}
+      if (dataInicio) createdAtFilter.gte = new Date(dataInicio)
+      if (dataFim) createdAtFilter.lte = new Date(dataFim)
+      where.createdAt = createdAtFilter
     }
 
     // Filtro por DUM
     if (dumInicio || dumFim) {
-      where.dum = {}
-      if (dumInicio) {
-        where.dum.gte = new Date(dumInicio)
-      }
-      if (dumFim) {
-        where.dum.lte = new Date(dumFim)
-      }
+      const dumFilter: Prisma.DateTimeFilter = {}
+      if (dumInicio) dumFilter.gte = new Date(dumInicio)
+      if (dumFim) dumFilter.lte = new Date(dumFim)
+      where.dum = dumFilter
     }
 
     // Filtro por DPP
     if (dppInicio || dppFim) {
-      if (!where.dpp) {
-        where.dpp = {}
-      }
-      if (dppInicio) {
-        where.dpp.gte = new Date(dppInicio)
-      }
-      if (dppFim) {
-        where.dpp.lte = new Date(dppFim)
-      }
+      const dppFilter: Prisma.DateTimeFilter = {}
+      if (dppInicio) dppFilter.gte = new Date(dppInicio)
+      if (dppFim) dppFilter.lte = new Date(dppFim)
+      where.dpp = dppFilter
     }
 
     // Filtro por gestações anteriores

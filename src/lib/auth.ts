@@ -71,6 +71,8 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
+    maxAge: 4 * 60 * 60, // 4 horas de validade máxima para conformidade médica/LGPD
+    updateAge: 60 * 60, // Atualiza a cada 1 hora se usuário ativo
   },
   callbacks: {
     async jwt({ token, user }) {

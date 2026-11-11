@@ -19,8 +19,41 @@ interface UBS {
   endereco: string
 }
 
+interface GestanteRelatorio {
+  id: string
+  nome: string
+  cartaoSus: string
+  dataNascimento?: string | Date | null
+  idade?: number | null
+  nomeUBS?: string
+  enderecoUBS?: string
+  ubs?: { nome: string; endereco: string }
+  dum: string | Date
+  dpp: string | Date
+  semanasGestacao?: number
+  etnia: string
+  gestacoesAnteriores: number
+  risco: string
+  descricaoRisco?: string | null
+  motivoAltoRisco?: string | null
+  exameRotina1Trimestre?: boolean
+  exameRotina2Trimestre?: boolean
+  exameRotina3Trimestre?: boolean
+  ultrassom1Trimestre?: boolean
+  ultrassom2Trimestre?: boolean
+  ultrassom3Trimestre?: boolean
+  vacinaHB?: boolean
+  vacinaDT?: boolean
+  vacinaInfluenza?: boolean
+  vacinaCovid19?: boolean
+  vacinaDTPA20Semana?: boolean
+  vacinaVSR28Semana?: boolean
+  createdAt: string | Date
+  [key: string]: unknown
+}
+
 interface RelatorioData {
-  gestantes: any[]
+  gestantes: GestanteRelatorio[]
   estatisticas: {
     total: number
     porRisco: {
@@ -270,8 +303,15 @@ export default function AdminPage() {
       new Date(g.createdAt).toLocaleDateString("pt-BR"),
     ])
 
+    const sanitizeCsvCell = (value: unknown): string => {
+      const stringValue = String(value ?? "")
+      // Prevenção contra CSV Formula Injection (se começar com =, +, -, @, \t ou \r)
+      const sanitized = /^[=+\-@\t\r]/.test(stringValue) ? `'${stringValue}` : stringValue
+      return `"${sanitized.replace(/"/g, '""')}"`
+    }
+
     const csvContent = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+      .map((row) => row.map(sanitizeCsvCell).join(","))
       .join("\n")
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })

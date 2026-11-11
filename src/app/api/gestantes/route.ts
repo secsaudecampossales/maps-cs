@@ -2,8 +2,16 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../../lib/prisma"
 import { addDays } from "date-fns"
 import { getAuthSession, requireAuth } from "../../../lib/auth-api"
-import { removeGestantesPosTresMeses } from "../../../lib/gestantes"
 import { compactDefined, isAcompanhamentoAtivo, parseMonitoramentoFields } from "../../../lib/monitoramento"
+import {
+  sanitizeText,
+  validateCartaoSus,
+  validateDate,
+  validateEtnia,
+  validateNome,
+  validateRisco,
+  validateTelefone,
+} from "../../../lib/validation"
 
 // GET - Listar todas as gestantes
 export async function GET(request: NextRequest) {
@@ -26,12 +34,6 @@ export async function GET(request: NextRequest) {
       ? undefined
       : { ubsId: session.user.ubsId! }
 
-    try {
-      await removeGestantesPosTresMeses()
-    } catch (cleanupError) {
-      console.error("Falha ao executar limpeza automática de ex-gestantes:", cleanupError)
-      // Não bloqueia a listagem caso a limpeza falhe em produção.
-    }
     const gestantes = await prisma.gestante.findMany({
       where: whereClause,
       include: {
@@ -107,96 +109,83 @@ export async function POST(request: NextRequest) {
       vacinas,
     } = body
 
-    // Validações
-    if (!cartaoSus) {
-      return NextResponse.json(
-        { error: "Cartão do SUS é obrigatório" },
-        { 
-          status: 400,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      )
+    // Validações rigorosas de entrada
+    const nomeValidation = validateNome(nome)
+    if (!nomeValidation.valid) {
+      return NextResponse.json({ error: nomeValidation.error }, { status: 400 })
     }
 
-    if (!dataNascimento) {
-      return NextResponse.json(
-        { error: "Data de nascimento é obrigatória" },
-        {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
+    const cartaoValidation = validateCartaoSus(cartaoSus)
+    if (!cartaoValidation.valid) {
+      return NextResponse.json({ error: cartaoValidation.error }, { status: 400 })
+    }
+
+    const dataNascimentoValidation = validateDate(dataNascimento, "Data de nascimento", { allowFuture: false, maxYearsAgo: 80 })
+    if (!dataNascimentoValidation.valid) {
+      return NextResponse.json({ error: dataNascimentoValidation.error }, { status: 400 })
+    }
+
+    const dumValidation = validateDate(dum, "Data da Última Menstruação (DUM)", { allowFuture: false, maxYearsAgo: 2 })
+    if (!dumValidation.valid) {
+      return NextResponse.json({ error: dumValidation.error }, { status: 400 })
+    }
+
+    const etniaValidation = validateEtnia(etnia)
+    if (!etniaValidation.valid) {
+      return NextResponse.json({ error: etniaValidation.error }, { status: 400 })
+    }
+
+    const riscoValidation = validateRisco(risco)
+    if (!riscoValidation.valid) {
+      return NextResponse.json({ error: riscoValidation.error }, { status: 400 })
+    }
+
+    if (riscoValidation.value === "Risco Alto" && !sanitizeText(motivoAltoRisco)) {
+      return NextResponse.json({ error: "Motivo do alto risco é obrigatório para gestações de Alto Risco." }, { status: 400 })
     }
 
     const semanasInicioPreNatalNumero = Number(semanasInicioPreNatal)
     if (!Number.isInteger(semanasInicioPreNatalNumero) || semanasInicioPreNatalNumero < 1 || semanasInicioPreNatalNumero > 45) {
       return NextResponse.json(
         { error: "Semanas de início do pré-natal inválida. Informe um valor entre 1 e 45." },
-        {
-          status: 400,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        { status: 400 }
       )
     }
-    
-    let telefoneValue: string | null = null
-    if (telefone !== undefined && telefone !== null) {
-      const digits = String(telefone).replace(/\D/g, "")
-      if (digits.length > 0) {
-        if (digits.length < 10 || digits.length > 11) {
-          return NextResponse.json(
-            { error: "Telefone inválido. Informe DDD + número com 10 ou 11 dígitos." },
-            {
-              status: 400,
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          )
-        }
-        telefoneValue = digits
-      }
+
+    const telefoneValidation = validateTelefone(telefone)
+    if (!telefoneValidation.valid) {
+      return NextResponse.json({ error: telefoneValidation.error }, { status: 400 })
+    }
+
+    const gestacoesAnterioresNumero = parseInt(String(gestacoesAnteriores), 10) || 0
+    if (gestacoesAnterioresNumero < 0 || gestacoesAnterioresNumero > 50) {
+      return NextResponse.json({ error: "Número de gestações anteriores inválido." }, { status: 400 })
     }
 
     const ubsDestino = session.user.isAdmin ? ubsId : session.user.ubsId
-
     if (!ubsDestino) {
-      return NextResponse.json(
-        { error: "UBS é obrigatória" },
-        { 
-          status: 400,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      )
+      return NextResponse.json({ error: "UBS é obrigatória." }, { status: 400 })
     }
 
     // Calcular DPP (DUM + 280 dias)
-    const dpp = addDays(new Date(dum), 280)
+    const dpp = addDays(dumValidation.value!, 280)
     const monitoramento = compactDefined(parseMonitoramentoFields(body))
 
     const gestante = await prisma.gestante.create({
       data: {
-        nome,
-        dataNascimento: new Date(dataNascimento),
-        cartaoSus,
-        telefone: telefoneValue,
+        nome: nomeValidation.value!,
+        dataNascimento: dataNascimentoValidation.value!,
+        cartaoSus: cartaoValidation.value!,
+        telefone: telefoneValidation.value ?? null,
         ubsId: ubsDestino,
-        dum: new Date(dum),
+        dum: dumValidation.value!,
         dpp,
         semanasInicioPreNatal: semanasInicioPreNatalNumero,
-        etnia,
-        gestacoesAnteriores: parseInt(gestacoesAnteriores) || 0,
-        risco,
-        descricaoRisco: descricaoRisco || null,
-        motivoAltoRisco: motivoAltoRisco || null,
+        etnia: etniaValidation.value!,
+        gestacoesAnteriores: gestacoesAnterioresNumero,
+        risco: riscoValidation.value!,
+        descricaoRisco: sanitizeText(descricaoRisco) || null,
+        motivoAltoRisco: sanitizeText(motivoAltoRisco) || null,
         exameRotina1Trimestre: exames?.rotina1 || false,
         exameRotina2Trimestre: exames?.rotina2 || false,
         exameRotina3Trimestre: exames?.rotina3 || false,

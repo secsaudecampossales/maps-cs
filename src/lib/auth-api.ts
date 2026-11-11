@@ -6,7 +6,7 @@ export async function getAuthSession() {
   return await getServerSession(authOptions)
 }
 
-export async function requireAuth(request: NextRequest) {
+export async function requireAuth(_request?: NextRequest) {
   const session = await getAuthSession()
   if (!session) {
     return NextResponse.json(
@@ -17,7 +17,7 @@ export async function requireAuth(request: NextRequest) {
   return null
 }
 
-export async function requireAdmin(request: NextRequest) {
+export async function requireAdmin(_request?: NextRequest) {
   const session = await getAuthSession()
   if (!session) {
     return NextResponse.json(

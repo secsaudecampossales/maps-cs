@@ -95,32 +95,36 @@ export async function removeGestantesPosTresMeses() {
     hoje.getDate()
   )
 
-  const gestantesParaExcluir = await prisma.gestante.findMany({
-    where: {
-      dpp: {
-        lt: tresMesesAtras,
+  return await prisma.$transaction(async (tx) => {
+    const gestantesParaExcluir = await tx.gestante.findMany({
+      where: {
+        dpp: {
+          lt: tresMesesAtras,
+        },
       },
-    },
-  })
-
-  if (gestantesParaExcluir.length > 0) {
-    await prisma.gestanteExcluida.createMany({
-      data: gestantesParaExcluir.map((gestante) => ({
-        ...snapshotExclusao(gestante),
-        enfermeiroId: null,
-        motivoExclusao: "automatica",
-      })),
     })
-  }
 
-  const result = await prisma.gestante.deleteMany({
-    where: {
-      dpp: {
-        lt: tresMesesAtras,
-      },
-    },
+    if (gestantesParaExcluir.length > 0) {
+      await tx.gestanteExcluida.createMany({
+        data: gestantesParaExcluir.map((gestante) => ({
+          ...snapshotExclusao(gestante),
+          enfermeiroId: null,
+          motivoExclusao: "automatica",
+        })),
+      })
+
+      const result = await tx.gestante.deleteMany({
+        where: {
+          dpp: {
+            lt: tresMesesAtras,
+          },
+        },
+      })
+      return result.count
+    }
+
+    return 0
   })
-  return result.count
 }
 
 export { snapshotExclusao }

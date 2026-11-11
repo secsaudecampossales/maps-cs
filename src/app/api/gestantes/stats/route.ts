@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../../../lib/prisma"
 import { startOfMonth, endOfMonth } from "date-fns"
 import { getAuthSession, requireAuth } from "../../../../lib/auth-api"
-import { removeGestantesPosTresMeses } from "../../../../lib/gestantes"
 import { isAcompanhamentoAtivo } from "../../../../lib/monitoramento"
 
 // GET - Estatísticas das gestantes
@@ -26,8 +25,6 @@ export async function GET(request: NextRequest) {
     const whereClause = session.user.isAdmin
       ? undefined
       : { ubsId: session.user.ubsId! }
-
-    await removeGestantesPosTresMeses()
 
     const gestantes = await prisma.gestante.findMany({
       where: whereClause,

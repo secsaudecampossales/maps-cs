@@ -4,6 +4,15 @@ import { addDays } from "date-fns"
 import { getAuthSession, requireAuth } from "../../../../lib/auth-api"
 import { compactDefined, parseMonitoramentoFields } from "../../../../lib/monitoramento"
 import { snapshotExclusao } from "../../../../lib/gestantes"
+import {
+  sanitizeText,
+  validateCartaoSus,
+  validateDate,
+  validateEtnia,
+  validateNome,
+  validateRisco,
+  validateTelefone,
+} from "../../../../lib/validation"
 
 // GET - Buscar gestante por ID
 export async function GET(
@@ -99,12 +108,6 @@ export async function PUT(
       vacinas,
     } = body
 
-    // Calcular DPP se DUM foi alterada
-    let dpp = undefined
-    if (dum) {
-      dpp = addDays(new Date(dum), 280)
-    }
-
     const gestanteAtual = await prisma.gestante.findUnique({ where: { id } })
     if (!gestanteAtual) {
       return NextResponse.json({ error: "Gestante não encontrada" }, { status: 404 })
@@ -117,61 +120,86 @@ export async function PUT(
       )
     }
 
-    let telefoneValue: string | null | undefined
-    if (telefone !== undefined) {
-      const digits = String(telefone).replace(/\D/g, "")
-      if (digits.length === 0) {
-        // usuário limpou o telefone -> gravar como null
-        telefoneValue = null
-      } else {
-        if (digits.length < 10 || digits.length > 11) {
-          return NextResponse.json(
-            { error: "Telefone inválido. Informe DDD + número com 10 ou 11 dígitos." },
-            {
-              status: 400,
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          )
-        }
-        telefoneValue = digits
-      }
+    const updatedData: Record<string, unknown> = {}
+
+    if (nome !== undefined) {
+      const v = validateNome(nome)
+      if (!v.valid) return NextResponse.json({ error: v.error }, { status: 400 })
+      updatedData.nome = v.value
     }
 
-    let semanasInicioPreNatalValue: number | undefined
+    if (cartaoSus !== undefined) {
+      const v = validateCartaoSus(cartaoSus)
+      if (!v.valid) return NextResponse.json({ error: v.error }, { status: 400 })
+      updatedData.cartaoSus = v.value
+    }
+
+    if (dataNascimento !== undefined) {
+      const v = validateDate(dataNascimento, "Data de nascimento", { allowFuture: false, maxYearsAgo: 80 })
+      if (!v.valid) return NextResponse.json({ error: v.error }, { status: 400 })
+      updatedData.dataNascimento = v.value
+    }
+
+    if (dum !== undefined) {
+      const v = validateDate(dum, "Data da Última Menstruação (DUM)", { allowFuture: false, maxYearsAgo: 2 })
+      if (!v.valid) return NextResponse.json({ error: v.error }, { status: 400 })
+      updatedData.dum = v.value
+      updatedData.dpp = addDays(v.value!, 280)
+    }
+
+    if (etnia !== undefined) {
+      const v = validateEtnia(etnia)
+      if (!v.valid) return NextResponse.json({ error: v.error }, { status: 400 })
+      updatedData.etnia = v.value
+    }
+
+    if (risco !== undefined) {
+      const v = validateRisco(risco)
+      if (!v.valid) return NextResponse.json({ error: v.error }, { status: 400 })
+      updatedData.risco = v.value
+    }
+
+    if (telefone !== undefined) {
+      const v = validateTelefone(telefone)
+      if (!v.valid) return NextResponse.json({ error: v.error }, { status: 400 })
+      updatedData.telefone = v.value
+    }
+
     if (semanasInicioPreNatal !== undefined) {
       const parsedSemanasInicioPreNatal = Number(semanasInicioPreNatal)
       if (!Number.isInteger(parsedSemanasInicioPreNatal) || parsedSemanasInicioPreNatal < 1 || parsedSemanasInicioPreNatal > 45) {
         return NextResponse.json(
           { error: "Semanas de início do pré-natal inválida. Informe um valor entre 1 e 45." },
-          {
-            status: 400,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+          { status: 400 }
         )
       }
-      semanasInicioPreNatalValue = parsedSemanasInicioPreNatal
+      updatedData.semanasInicioPreNatal = parsedSemanasInicioPreNatal
+    }
+
+    if (gestacoesAnteriores !== undefined) {
+      const num = parseInt(String(gestacoesAnteriores), 10)
+      if (Number.isNaN(num) || num < 0 || num > 50) {
+        return NextResponse.json({ error: "Número de gestações anteriores inválido." }, { status: 400 })
+      }
+      updatedData.gestacoesAnteriores = num
+    }
+
+    if (session.user.isAdmin && ubsId) {
+      updatedData.ubsId = ubsId
+    }
+
+    if (descricaoRisco !== undefined) {
+      updatedData.descricaoRisco = sanitizeText(descricaoRisco) || null
+    }
+
+    if (motivoAltoRisco !== undefined) {
+      updatedData.motivoAltoRisco = sanitizeText(motivoAltoRisco) || null
     }
 
     const gestante = await prisma.gestante.update({
       where: { id },
       data: {
-        ...(nome && { nome }),
-        ...(dataNascimento && { dataNascimento: new Date(dataNascimento) }),
-        ...(cartaoSus && { cartaoSus }),
-        ...(telefoneValue !== undefined && { telefone: telefoneValue }),
-        ...(session.user.isAdmin && ubsId && { ubsId }),
-        ...(dum && { dum: new Date(dum) }),
-        ...(dpp && { dpp }),
-        ...(semanasInicioPreNatalValue !== undefined && { semanasInicioPreNatal: semanasInicioPreNatalValue }),
-        ...(etnia && { etnia }),
-        ...(gestacoesAnteriores !== undefined && { gestacoesAnteriores: parseInt(gestacoesAnteriores) }),
-        ...(risco && { risco }),
-        ...(descricaoRisco !== undefined && { descricaoRisco }),
-        ...(motivoAltoRisco !== undefined && { motivoAltoRisco }),
+        ...updatedData,
         ...(exames && {
           exameRotina1Trimestre: exames.rotina1 ?? undefined,
           exameRotina2Trimestre: exames.rotina2 ?? undefined,
@@ -238,28 +266,19 @@ export async function DELETE(
       )
     }
 
-    // Registrar a exclusão antes de deletar
-    try {
-      await prisma.gestanteExcluida.create({
+    // Registrar auditoria e excluir de forma atômica via transação
+    await prisma.$transaction(async (tx) => {
+      await tx.gestanteExcluida.create({
         data: {
           ...snapshotExclusao(gestanteAtual),
           enfermeiroId: session.user.id,
           motivoExclusao: "manual",
         },
       })
-    } catch (auditError) {
-      console.error("Erro ao registrar exclusão na auditoria:", auditError)
-      // Se o modelo não existe, pode ser que o Prisma Client não foi regenerado
-      // ou o servidor precisa ser reiniciado
-      if (auditError instanceof Error && auditError.message.includes("undefined")) {
-        throw new Error("Prisma Client não atualizado. Execute 'npx prisma generate' e reinicie o servidor.")
-      }
-      // Continuar com a exclusão mesmo se falhar o registro de auditoria
-      // para não bloquear a funcionalidade
-    }
 
-    await prisma.gestante.delete({
-      where: { id },
+      await tx.gestante.delete({
+        where: { id },
+      })
     })
 
     return NextResponse.json(
