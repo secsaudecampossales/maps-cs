@@ -27,7 +27,11 @@ export default function LoginPage() {
       })
 
       if (result?.error) {
-        setErro("Email ou senha incorretos")
+        if (result.error.includes("bloquead") || result.error.includes("tentativas")) {
+          setErro(result.error)
+        } else {
+          setErro("Email ou senha incorretos")
+        }
         setCarregando(false)
       } else if (result?.ok) {
         await new Promise((resolve) => setTimeout(resolve, 100))

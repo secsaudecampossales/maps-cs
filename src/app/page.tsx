@@ -53,10 +53,6 @@ export default function Dashboard() {
   const [cleaning, setCleaning] = useState(false)
   const [showCleanupConfirm, setShowCleanupConfirm] = useState(false)
 
-  useEffect(() => {
-    fetchData()
-  }, [])
-
   const fetchData = async () => {
     setError(null)
     try {
@@ -131,6 +127,10 @@ export default function Dashboard() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
 
   const filteredGestantes = gestantes.filter((gestante) => {
     if (!isGestacaoAtiva(gestante.dum)) return false

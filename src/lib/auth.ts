@@ -2,6 +2,8 @@ import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { prisma } from "./prisma"
 import bcrypt from "bcryptjs"
+import { checkLoginRateLimit, recordFailedLogin, recordSuccessfulLogin } from "./rate-limit"
+import { logSecurityEvent } from "./security-logger"
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -11,15 +13,37 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         senha: { label: "Senha", type: "password" }
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
+        const clientIp = (req?.headers?.["x-forwarded-for"] as string)?.split(",")[0]?.trim() || "127.0.0.1"
+
         try {
           if (!credentials?.email || !credentials?.senha) {
-            console.error("Credenciais incompletas")
+            logSecurityEvent({
+              event: "AUTH_LOGIN_FAILED",
+              level: "WARN",
+              details: { reason: "Credenciais incompletas", ip: clientIp },
+            })
             return null
           }
 
           const emailNormalizado = credentials.email.trim().toLowerCase()
           const senhaInformada = credentials.senha.trim()
+
+          // Proteção contra força bruta (Rate Limit por email e por IP)
+          const emailRate = checkLoginRateLimit(emailNormalizado)
+          const ipRate = checkLoginRateLimit(clientIp)
+
+          if (!emailRate.allowed || !ipRate.allowed) {
+            const retryAfter = emailRate.retryAfterSeconds || ipRate.retryAfterSeconds || 900
+            const minutos = Math.ceil(retryAfter / 60)
+            logSecurityEvent({
+              event: "AUTH_RATE_LIMIT_BLOCKED",
+              level: "SECURITY_ALERT",
+              actor: { email: emailNormalizado, ip: clientIp },
+              details: { retryAfterSeconds: retryAfter },
+            })
+            throw new Error(`Muitas tentativas inválidas. Conta bloqueada temporariamente. Tente novamente em ${minutos} minutos.`)
+          }
 
           const enfermeiro = await prisma.enfermeiro.findFirst({
             where: {
@@ -39,16 +63,50 @@ export const authOptions: NextAuthOptions = {
           })
 
           if (!enfermeiro) {
-            console.error("Enfermeiro não encontrado:", emailNormalizado)
+            recordFailedLogin(emailNormalizado)
+            recordFailedLogin(clientIp)
+            logSecurityEvent({
+              event: "AUTH_LOGIN_FAILED",
+              level: "WARN",
+              actor: { email: emailNormalizado, ip: clientIp },
+              details: { reason: "Usuário não encontrado" },
+            })
             return null
           }
 
           const senhaValida = await bcrypt.compare(senhaInformada, enfermeiro.senha)
 
           if (!senhaValida) {
-            console.error("Senha inválida para:", emailNormalizado)
+            const failEmail = recordFailedLogin(emailNormalizado)
+            const failIp = recordFailedLogin(clientIp)
+            logSecurityEvent({
+              event: "AUTH_LOGIN_FAILED",
+              level: "WARN",
+              actor: { id: enfermeiro.id, email: emailNormalizado, ip: clientIp },
+              details: { reason: "Senha incorreta" },
+            })
+
+            if (failEmail.blocked || failIp.blocked) {
+              throw new Error("Limite de tentativas excedido. Acesso bloqueado por 15 minutos.")
+            }
             return null
           }
+
+          // Login com sucesso: limpa o contador de tentativas falhas
+          recordSuccessfulLogin(emailNormalizado)
+          recordSuccessfulLogin(clientIp)
+
+          logSecurityEvent({
+            event: "AUTH_LOGIN_SUCCESS",
+            level: "INFO",
+            actor: {
+              id: enfermeiro.id,
+              email: enfermeiro.email,
+              role: enfermeiro.isAdmin ? "admin" : "enfermeiro",
+              ubsId: enfermeiro.ubsId ?? undefined,
+              ip: clientIp,
+            },
+          })
 
           const ubsId = enfermeiro.ubsId ?? undefined
 
@@ -60,7 +118,14 @@ export const authOptions: NextAuthOptions = {
             ubsId,
           }
         } catch (error) {
-          console.error("Erro no authorize:", error)
+          if (error instanceof Error && (error.message.includes("bloqueada") || error.message.includes("bloqueado"))) {
+            throw error
+          }
+          logSecurityEvent({
+            event: "SYSTEM_ERROR",
+            level: "ERROR",
+            details: { error: error instanceof Error ? error.message : String(error) },
+          })
           return null
         }
       }

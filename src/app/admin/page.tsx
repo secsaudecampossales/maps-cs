@@ -130,6 +130,18 @@ export default function AdminPage() {
     partoProximos3Meses: "",
   })
 
+  const fetchUBS = async () => {
+    try {
+      const response = await fetch("/api/admin/ubs")
+      if (response.ok) {
+        const ubs = await response.json()
+        setUbsList(ubs)
+      }
+    } catch (error) {
+      console.error("Erro ao buscar UBS:", error)
+    }
+  }
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login")
@@ -143,18 +155,6 @@ export default function AdminPage() {
       fetchUBS()
     }
   }, [status, session, router])
-
-  const fetchUBS = async () => {
-    try {
-      const response = await fetch("/api/admin/ubs")
-      if (response.ok) {
-        const ubs = await response.json()
-        setUbsList(ubs)
-      }
-    } catch (error) {
-      console.error("Erro ao buscar UBS:", error)
-    }
-  }
 
   const gerarRelatorio = async () => {
     setLoading(true)

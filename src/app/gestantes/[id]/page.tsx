@@ -66,13 +66,6 @@ export default function EditarGestantePage() {
     ...CAMPOS_PLANILHA_INICIAL,
   })
 
-  useEffect(() => {
-    fetchUBS()
-    if (id) {
-      fetchGestante()
-    }
-  }, [id])
-
   const fetchUBS = async () => {
     try {
       const response = await fetch("/api/ubs")
@@ -151,6 +144,13 @@ export default function EditarGestantePage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchUBS()
+    if (id) {
+      fetchGestante()
+    }
+  }, [id])
 
   const handleCartaoSusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
