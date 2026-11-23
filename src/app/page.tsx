@@ -31,6 +31,8 @@ import {
   Check,
   Filter,
   RefreshCw,
+  X,
+  Sparkles,
 } from "lucide-react"
 
 export default function Dashboard() {
@@ -53,6 +55,7 @@ export default function Dashboard() {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [cleaning, setCleaning] = useState(false)
   const [showCleanupConfirm, setShowCleanupConfirm] = useState(false)
+  const [showUpdateModal, setShowUpdateModal] = useState(false)
 
   const fetchData = async () => {
     setError(null)
@@ -131,7 +134,20 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchData()
+    if (typeof window !== "undefined") {
+      const seen = localStorage.getItem("maps_update_policlinica_symbol_v1")
+      if (!seen) {
+        setShowUpdateModal(true)
+      }
+    }
   }, [])
+
+  const handleCloseUpdateModal = () => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("maps_update_policlinica_symbol_v1", "true")
+    }
+    setShowUpdateModal(false)
+  }
 
   const filteredGestantes = gestantes.filter((gestante) => {
     if (!isGestacaoAtiva(gestante.dum)) return false
@@ -256,10 +272,98 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+      {showUpdateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl bg-white shadow-2xl border border-gray-200">
+            <div className="flex items-start justify-between px-6 py-4 border-b border-gray-200">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Nota de Atualização
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Identificação das Gestantes da Policlínica
+                </h2>
+                <p className="text-sm text-gray-600">
+                  Novo indicador visual na lista de gestantes da tela inicial
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleCloseUpdateModal}
+                className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors"
+                aria-label="Fechar"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="px-6 py-5 space-y-4">
+              <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-4 text-sm text-emerald-950 space-y-2">
+                <div className="flex items-center gap-2 font-semibold text-emerald-900">
+                  <Image
+                    src="/brasao-do-ceara.png"
+                    alt="Brasão da Policlínica"
+                    width={16}
+                    height={22}
+                    className="h-5 w-auto object-contain"
+                  />
+                  <span>O que significa este símbolo antes do nome?</span>
+                </div>
+                <p className="text-emerald-900">
+                  O símbolo antes do nome da gestante indica que ela é <strong>acompanhada pela Policlínica Regional</strong> (estando com pré-natal compartilhado ou aguardando vaga).
+                </p>
+                <p className="text-xs text-emerald-800">
+                  Ao passar o mouse sobre o símbolo, você pode ver detalhes adicionais da situação na Atenção Ambulatorial Especializada (AAE).
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-xs font-semibold tracking-wide uppercase text-gray-600">
+                  Exemplo de visualização na tela inicial:
+                </p>
+                <div className="overflow-hidden rounded-lg border border-gray-200 shadow-sm bg-gray-50">
+                  <Image
+                    src="/atualizacoes/print01.PNG"
+                    alt="Exemplo do símbolo antes do nome da gestante na lista"
+                    width={900}
+                    height={400}
+                    className="w-full h-auto object-contain max-h-[300px]"
+                  />
+                  <div className="px-4 py-2 bg-gray-100 text-xs text-gray-600 border-t border-gray-200 text-center">
+                    O símbolo aparece automaticamente na coluna de nome para fácil identificação da equipe.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
+              <Button
+                onClick={handleCloseUpdateModal}
+                className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
+              >
+                <Check className="h-4 w-4" />
+                Entendi
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Título e Botão de Adicionar */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Visão geral</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Visão geral</h1>
+            <button
+              type="button"
+              onClick={() => setShowUpdateModal(true)}
+              className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100 border border-blue-200 transition-colors"
+              title="Ver nota de atualização sobre o símbolo da Policlínica"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-blue-600" />
+              <span>Nota de Atualização</span>
+            </button>
+          </div>
           <p className="mt-1 text-sm text-gray-600">
             Acompanhe rapidamente o risco, partos previstos e gestantes cadastradas na APS Campos Sales.
           </p>
@@ -521,8 +625,8 @@ export default function Dashboard() {
                       key={gestante.id}
                       className="border-b border-border odd:bg-white even:bg-gray-50 hover:bg-gray-100 transition-colors"
                     >
-                      <td className="p-4 font-medium text-gray-900">
-                        <div className="flex items-center gap-2">
+                      <td className="p-4 font-medium text-gray-900 whitespace-nowrap">
+                        <div className="inline-flex items-center gap-1.5">
                           {gestante.destinoAAE === "Policlínica" && (
                             <Image
                               src="/brasao-do-ceara.png"
@@ -534,9 +638,9 @@ export default function Dashboard() {
                                     ? "Encaminhada para a Policlínica (aguardando vaga)"
                                     : "Acompanhada pela Policlínica"
                               }
-                              width={20}
-                              height={27}
-                              className="h-5 w-auto object-contain shrink-0"
+                              width={14}
+                              height={19}
+                              className="h-4 w-auto object-contain shrink-0"
                             />
                           )}
                           <span>{gestante.nome}</span>

@@ -23,6 +23,6 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    "/((?!api/auth|api/health|login|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!api/auth|api/health|login|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|PNG|JPG|JPEG|SVG|GIF|WEBP|ICO)$).*)",
   ],
 }
