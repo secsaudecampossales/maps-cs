@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useSession } from "next-auth/react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -520,7 +521,27 @@ export default function Dashboard() {
                       key={gestante.id}
                       className="border-b border-border odd:bg-white even:bg-gray-50 hover:bg-gray-100 transition-colors"
                     >
-                      <td className="p-4 font-medium text-gray-900">{gestante.nome}</td>
+                      <td className="p-4 font-medium text-gray-900">
+                        <div className="flex items-center gap-2">
+                          {gestante.destinoAAE === "Policlínica" && (
+                            <Image
+                              src="/brasao-do-ceara.png"
+                              alt="Policlínica"
+                              title={
+                                gestante.statusAAE === "compartilhada"
+                                  ? "Acompanhamento compartilhado na Policlínica"
+                                  : gestante.statusAAE === "aguardando_vaga"
+                                    ? "Encaminhada para a Policlínica (aguardando vaga)"
+                                    : "Acompanhada pela Policlínica"
+                              }
+                              width={20}
+                              height={27}
+                              className="h-5 w-auto object-contain shrink-0"
+                            />
+                          )}
+                          <span>{gestante.nome}</span>
+                        </div>
+                      </td>
                       <td className="p-4 text-gray-800">{formatDate(gestante.dum)}</td>
                       <td className="p-4 text-gray-800">{formatDate(gestante.dpp)}</td>
                       <td className="p-4 text-gray-800">{calculateWeeks(gestante.dum)} semanas</td>

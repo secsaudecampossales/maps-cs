@@ -15,6 +15,8 @@ export interface GestanteListItem {
   createdAt: string
   ubsId: string
   ubs?: UBS
+  destinoAAE?: string | null
+  statusAAE?: string | null
 }
 
 export interface GestanteDetail {
