@@ -3,6 +3,7 @@
 import { Activity, ChevronDown, LogOut } from "lucide-react"
 import { useSession, signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 
@@ -62,99 +63,103 @@ export function Header() {
           </div>
         </Link>
 
-        {session && (
-          <div className="flex items-center gap-2 md:gap-4">
-            <div
-              className={`hidden sm:flex flex-col items-end leading-tight rounded-md px-2 py-1 ${
-                sessionWarning ? "bg-amber-500/20 animate-pulse" : ""
-              }`}
-              aria-live="polite"
-              aria-label={`Sessão encerra em ${minutes} minutos e ${seconds} segundos`}
-            >
-              <span className="text-[10px] text-blue-100/80">Sessão encerra em</span>
-              <span className="text-xs font-mono text-white">
-                {minutes.toString().padStart(2, "0")}:{seconds.toString().padStart(2, "0")}
-              </span>
-            </div>
+        <div className="flex items-center gap-2 md:gap-3">
+          <ThemeToggle className="bg-white/10 hover:bg-white/20 text-white" />
 
-            {session.user?.isAdmin && (
-              <div className="hidden md:flex gap-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  asChild
-                  className="bg-white/15 text-white border-white/20 hover:bg-white/25"
-                >
-                  <Link href="/admin">Área Admin</Link>
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  asChild
-                  className="bg-white/15 text-white border-white/20 hover:bg-white/25"
-                >
-                  <Link href="/admin/relatorios">Relatórios</Link>
-                </Button>
-              </div>
-            )}
-
-            <div className="relative">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setMenuOpen((o) => !o)}
-                className="border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white gap-1 max-w-[140px] md:max-w-none"
+          {session && (
+            <div className="flex items-center gap-2 md:gap-4">
+              <div
+                className={`hidden sm:flex flex-col items-end leading-tight rounded-md px-2 py-1 ${
+                  sessionWarning ? "bg-amber-500/20 animate-pulse" : ""
+                }`}
+                aria-live="polite"
+                aria-label={`Sessão encerra em ${minutes} minutos e ${seconds} segundos`}
               >
-                <span className="truncate hidden sm:inline">{session.user?.name}</span>
-                <ChevronDown className="h-4 w-4 shrink-0" />
-              </Button>
+                <span className="text-[10px] text-blue-100/80">Sessão encerra em</span>
+                <span className="text-xs font-mono text-white">
+                  {minutes.toString().padStart(2, "0")}:{seconds.toString().padStart(2, "0")}
+                </span>
+              </div>
 
-              {menuOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setMenuOpen(false)}
-                    aria-hidden="true"
-                  />
-                  <div className="absolute right-0 top-full mt-1 z-50 w-56 rounded-lg border bg-white shadow-lg py-1 text-gray-900">
-                    <div className="px-3 py-2 border-b">
-                      <p className="text-sm font-medium truncate">{session.user?.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {session.user?.isAdmin ? "Administrador" : "Profissional de Saúde"}
-                      </p>
-                    </div>
-                    {session.user?.isAdmin && (
-                      <>
-                        <Link
-                          href="/admin"
-                          className="block px-3 py-2 text-sm hover:bg-gray-50 md:hidden"
-                          onClick={() => setMenuOpen(false)}
-                        >
-                          Área Admin
-                        </Link>
-                        <Link
-                          href="/admin/relatorios"
-                          className="block px-3 py-2 text-sm hover:bg-gray-50 md:hidden"
-                          onClick={() => setMenuOpen(false)}
-                        >
-                          Relatórios
-                        </Link>
-                      </>
-                    )}
-                    <button
-                      type="button"
-                      className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50"
-                      onClick={() => signOut({ callbackUrl: "/login" })}
-                    >
-                      <LogOut className="h-4 w-4" />
-                      Sair
-                    </button>
-                  </div>
-                </>
+              {session.user?.isAdmin && (
+                <div className="hidden md:flex gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    asChild
+                    className="bg-white/15 text-white border-white/20 hover:bg-white/25"
+                  >
+                    <Link href="/admin">Área Admin</Link>
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    asChild
+                    className="bg-white/15 text-white border-white/20 hover:bg-white/25"
+                  >
+                    <Link href="/admin/relatorios">Relatórios</Link>
+                  </Button>
+                </div>
               )}
+
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setMenuOpen((o) => !o)}
+                  className="border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white gap-1 max-w-[140px] md:max-w-none"
+                >
+                  <span className="truncate hidden sm:inline">{session.user?.name}</span>
+                  <ChevronDown className="h-4 w-4 shrink-0" />
+                </Button>
+
+                {menuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setMenuOpen(false)}
+                      aria-hidden="true"
+                    />
+                    <div className="absolute right-0 top-full mt-1 z-50 w-56 rounded-lg border bg-white dark:bg-card dark:border-border shadow-lg py-1 text-gray-900 dark:text-foreground">
+                      <div className="px-3 py-2 border-b dark:border-border">
+                        <p className="text-sm font-medium truncate">{session.user?.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {session.user?.isAdmin ? "Administrador" : "Profissional de Saúde"}
+                        </p>
+                      </div>
+                      {session.user?.isAdmin && (
+                        <>
+                          <Link
+                            href="/admin"
+                            className="block px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-secondary/70 md:hidden"
+                            onClick={() => setMenuOpen(false)}
+                          >
+                            Área Admin
+                          </Link>
+                          <Link
+                            href="/admin/relatorios"
+                            className="block px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-secondary/70 md:hidden"
+                            onClick={() => setMenuOpen(false)}
+                          >
+                            Relatórios
+                          </Link>
+                        </>
+                      )}
+                      <button
+                        type="button"
+                        className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
+                        onClick={() => signOut({ callbackUrl: "/login" })}
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Sair
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </header>
   )

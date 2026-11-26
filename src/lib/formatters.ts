@@ -45,13 +45,13 @@ export function isGestacaoAtiva(dum: string | Date): boolean {
 export function getRiscoColor(risco: string): string {
   switch (risco) {
     case "Risco Baixo":
-      return "bg-green-100 text-green-800 border-green-300"
+      return "bg-green-100 text-green-800 border-green-300 dark:bg-green-950/60 dark:text-green-300 dark:border-green-800"
     case "Risco Intermediário":
-      return "bg-yellow-100 text-yellow-800 border-yellow-300"
+      return "bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800"
     case "Risco Alto":
-      return "bg-red-100 text-red-800 border-red-300"
+      return "bg-red-100 text-red-800 border-red-300 dark:bg-red-950/60 dark:text-red-300 dark:border-red-800"
     default:
-      return "bg-gray-100 text-gray-800 border-gray-300"
+      return "bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
   }
 }
 

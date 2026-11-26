@@ -115,7 +115,7 @@ export function MonitoramentoPlanilhaFields({ value, onChange }: Props) {
               value={value.numeroConsultas}
               onChange={(e) => set("numeroConsultas", e.target.value)}
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               A planilha conta gestantes com no mínimo 7 consultas.
             </p>
           </div>
@@ -180,7 +180,7 @@ export function MonitoramentoPlanilhaFields({ value, onChange }: Props) {
                 value={value.dataAcessoAAE}
                 onChange={(e) => set("dataAcessoAAE", e.target.value)}
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Usada para calcular a média de tempo de acesso na planilha.
               </p>
             </div>

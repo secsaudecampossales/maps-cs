@@ -1112,8 +1112,8 @@ export default function AdminPage() {
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse min-w-[1400px]">
                   <thead>
-                    <tr className="border-b bg-gray-50">
-                      <th className="text-left p-2 font-semibold text-sm sticky left-0 bg-gray-50 z-10">Nome</th>
+                    <tr className="border-b bg-gray-50 dark:bg-secondary/60">
+                      <th className="text-left p-2 font-semibold text-sm sticky left-0 bg-gray-50 dark:bg-secondary z-10">Nome</th>
                       <th className="text-left p-2 font-semibold text-sm">Cartão SUS</th>
                       <th className="text-left p-2 font-semibold text-sm">Nascimento</th>
                       <th className="text-left p-2 font-semibold text-sm">Idade</th>
@@ -1140,8 +1140,8 @@ export default function AdminPage() {
                   </thead>
                   <tbody>
                     {relatorio.gestantes.map((gestante) => (
-                      <tr key={gestante.id} className="border-b hover:bg-gray-50">
-                        <td className="p-2 font-medium sticky left-0 bg-white z-10">{gestante.nome}</td>
+                      <tr key={gestante.id} className="border-b hover:bg-gray-50 dark:hover:bg-secondary/40">
+                        <td className="p-2 font-medium sticky left-0 bg-white dark:bg-card z-10">{gestante.nome}</td>
                         <td className="p-2 text-sm">{gestante.cartaoSus}</td>
                         <td className="p-2 text-sm">
                           {gestante.dataNascimento

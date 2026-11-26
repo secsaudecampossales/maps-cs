@@ -287,8 +287,8 @@ export default function EditarGestantePage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Editar Gestante</h1>
-            <p className="text-gray-600 mt-1">Atualize os dados da gestante</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-foreground">Editar Gestante</h1>
+            <p className="text-gray-600 dark:text-muted-foreground mt-1">Atualize os dados da gestante</p>
           </div>
         </div>
         <Button variant="destructive" onClick={handleDelete} className="gap-2">
@@ -337,7 +337,7 @@ export default function EditarGestantePage() {
                 required
                 maxLength={18}
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Número do cartão do SUS (obrigatório e único)
               </p>
             </div>
@@ -352,7 +352,7 @@ export default function EditarGestantePage() {
                 placeholder="(99) 99999-9999"
                 maxLength={16}
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Opcional. Informe o telefone com DDD (10 ou 11 dígitos) se disponível.
               </p>
             </div>
@@ -407,7 +407,7 @@ export default function EditarGestantePage() {
                   disabled
                   className="bg-gray-50"
                 />
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Calculado automaticamente (DUM + 280 dias)
                 </p>
               </div>
@@ -427,7 +427,7 @@ export default function EditarGestantePage() {
                 placeholder="Ex: 12"
                 required
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Informe com quantas semanas gestacionais iniciou o acompanhamento pré-natal.
               </p>
             </div>

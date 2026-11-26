@@ -189,8 +189,8 @@ export default function NovaGestantePage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Cadastrar Nova Gestante</h1>
-          <p className="text-gray-600 mt-1">Preencha os dados da gestante</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-foreground">Cadastrar Nova Gestante</h1>
+          <p className="text-gray-600 dark:text-muted-foreground mt-1">Preencha os dados da gestante</p>
         </div>
       </div>
 
@@ -234,7 +234,7 @@ export default function NovaGestantePage() {
                 required
                 maxLength={18}
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Número do cartão do SUS (obrigatório e único)
               </p>
             </div>
@@ -249,7 +249,7 @@ export default function NovaGestantePage() {
                 placeholder="(99) 99999-9999"
                 maxLength={16}
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Opcional. Informe o telefone com DDD (10 ou 11 dígitos) se disponível.
               </p>
             </div>
@@ -304,7 +304,7 @@ export default function NovaGestantePage() {
                   disabled
                   className="bg-gray-50"
                 />
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Calculado automaticamente (DUM + 280 dias)
                 </p>
               </div>
@@ -324,7 +324,7 @@ export default function NovaGestantePage() {
                 placeholder="Ex: 12"
                 required
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Informe com quantas semanas gestacionais iniciou o acompanhamento pré-natal.
               </p>
             </div>

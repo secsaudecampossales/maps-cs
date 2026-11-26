@@ -8,6 +8,9 @@ export function Footer() {
         <p className="text-[11px] text-muted-foreground">
           Foco em cuidado contínuo, acompanhamento humanizado e tomada de decisão baseada em dados.
         </p>
+        <p className="text-[11px] text-muted-foreground/80 pt-1">
+          Desenvolvido por <span className="font-medium text-foreground/80">Ednario Andrade</span>
+        </p>
       </div>
     </footer>
   )
